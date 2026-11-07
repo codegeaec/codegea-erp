@@ -22,6 +22,9 @@ foreach ($warehouses as $w) {
 <section class="cerp-card">
 	<div class="cerp-card-head">
 		<h2>Bodega de la tienda</h2>
+		<?php if (Codegea_ERP_Settings::is_configured()) : ?>
+			<button type="submit" name="refresh" value="1" class="button cerp-btn-icon"><span class="dashicons dashicons-update" aria-hidden="true"></span>Actualizar lista</button>
+		<?php endif; ?>
 	</div>
 	<p class="cerp-muted">Los pedidos de la tienda descuentan el stock de esta bodega del ERP.</p>
 	<?php if ($warehouses) : ?>
@@ -41,7 +44,7 @@ foreach ($warehouses as $w) {
 				</label>
 			<?php endforeach; ?>
 		</div>
-		<p class="cerp-muted">Lista actualizada <?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'] ?? '')); ?>. ¿Creaste una bodega nueva en el ERP? Actualiza la lista abajo.</p>
+		<p class="cerp-muted cerp-footnote">Lista traída del ERP <?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'] ?? '')); ?>. ¿Creaste una bodega nueva? Usa «Actualizar lista».</p>
 	<?php elseif (Codegea_ERP_Settings::is_connected()) : ?>
 		<div class="notice notice-info inline cerp-notice"><p>El ERP todavía no tiene bodegas. Créalas en el ERP (Inventario → Bodegas) y actualiza la lista.</p></div>
 	<?php endif; ?>
@@ -57,7 +60,3 @@ foreach ($warehouses as $w) {
 </section>
 <p class="cerp-actions"><button type="submit" class="button button-primary">Guardar</button></p>
 </form>
-
-<?php if (Codegea_ERP_Settings::is_configured()) : ?>
-	<div class="cerp-inline-action"><?php Codegea_ERP_Admin::ping_button('stock', 'Actualizar lista de bodegas'); ?></div>
-<?php endif; ?>

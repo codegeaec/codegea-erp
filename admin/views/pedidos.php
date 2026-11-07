@@ -25,8 +25,9 @@ $info = Codegea_ERP_Settings::erp_info();
 </section>
 
 <section class="cerp-card">
-	<h2>Cuándo se envía</h2>
-	<p class="cerp-muted">Cada pedido se envía una sola vez, la primera vez que pasa a uno de estos estados.</p>
+	<h2>¿En qué estado del pedido se manda al ERP?</h2>
+	<p class="cerp-muted">El pedido se manda al ERP apenas llega a uno de los estados marcados. No se duplica: si pasa de
+		<em>Procesando</em> a <em>Completado</em> no se vuelve a mandar, y si llegó <em>En espera</em> y luego se paga, el ERP confirma esa misma venta.</p>
 	<div class="cerp-checks">
 		<?php foreach (Codegea_ERP_Settings::ORDER_STATUSES as $value => $status) : ?>
 			<label class="cerp-check">

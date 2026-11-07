@@ -28,7 +28,7 @@
 	padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 13px;
 	border: 1px solid transparent;
 }
-.cerp-pill .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.cerp-pill .dashicons { font-size: 16px; width: 16px; height: 16px; line-height: 1; }
 .cerp-pill--ok { background: #edfaef; color: #00701a; border-color: #b8e6bf; }
 .cerp-pill--error { background: #fcf0f1; color: #b32d2e; border-color: #f0b8b9; }
 .cerp-pill--off { background: #f6f7f7; color: var(--cerp-muted); border-color: var(--cerp-border); }
@@ -42,7 +42,7 @@
 .cerp-tab:hover { color: #1d2327; }
 .cerp-tab:focus { box-shadow: none; outline: 2px solid var(--cerp-accent); outline-offset: -2px; }
 .cerp-tab.is-active { color: #1d2327; border-bottom-color: var(--cerp-accent); }
-.cerp-tab .dashicons { font-size: 17px; width: 17px; height: 17px; }
+.cerp-tab .dashicons { font-size: 17px; width: 17px; height: 17px; line-height: 1; }
 
 .cerp-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
 @media (max-width: 960px) { .cerp-layout { grid-template-columns: 1fr; } }
@@ -64,9 +64,11 @@
 .cerp-field label { display: block; font-weight: 600; margin-bottom: 6px; }
 .cerp-field input.regular-text { width: 100%; max-width: 480px; }
 .cerp-field .description { margin-top: 4px; }
-.cerp-actions { margin: 4px 0 0; }
+.cerp-actions { margin: 4px 0 0; display: flex; gap: 8px; flex-wrap: wrap; }
 .cerp-actions .button-primary { min-height: 34px; padding: 0 16px; }
-.button .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: text-bottom; }
+/* Botones con ícono: ícono y texto centrados en la misma línea (el .button de WP no lo hace). */
+.cerp .cerp-btn-icon { display: inline-flex; align-items: center; gap: 6px; }
+.cerp .cerp-btn-icon .dashicons { font-size: 16px; width: 16px; height: 16px; line-height: 1; margin: 0; }
 
 .cerp-options { display: grid; gap: 8px; }
 .cerp-option, .cerp-check {
@@ -91,9 +93,10 @@
 .cerp-facts dt { color: var(--cerp-muted); font-size: 12px; }
 .cerp-facts dd { margin: 2px 0 0; font-weight: 600; }
 
-.cerp-inline-action { margin-top: -4px; }
+.cerp-footnote { margin: 12px 0 0; font-size: 12.5px; }
 
 .cerp-help h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 14px; }
+.cerp-help h3 .dashicons { line-height: 1; }
 .cerp-help ul { margin: 0; padding-left: 18px; list-style: disc; color: #3c434a; }
 .cerp-help li { margin-bottom: 6px; }
 

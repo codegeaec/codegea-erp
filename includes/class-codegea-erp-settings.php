@@ -25,9 +25,9 @@ final class Codegea_ERP_Settings {
 	);
 
 	const ORDER_STATUSES = array(
-		'processing' => array('label' => 'Procesando', 'help' => 'Pagado: es el estado habitual de un pedido nuevo.'),
-		'completed' => array('label' => 'Completado', 'help' => 'Para pedidos que se marcan completados sin pasar por Procesando.'),
-		'on-hold' => array('label' => 'En espera', 'help' => 'Ej. transferencia por confirmar: llega como borrador hasta que se pague.'),
+		'processing' => array('label' => 'Procesando', 'help' => 'El cliente ya pagó. Es el estado normal de un pedido nuevo: déjalo marcado.'),
+		'completed' => array('label' => 'Completado', 'help' => 'Por si marcas pedidos como completados directamente, sin pasar por Procesando.'),
+		'on-hold' => array('label' => 'En espera', 'help' => 'Pago pendiente de confirmar (ej. transferencia). Llega al ERP como borrador, sin descontar stock.'),
 	);
 
 	public static function defaults() {

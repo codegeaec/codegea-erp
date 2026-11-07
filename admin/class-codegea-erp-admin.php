@@ -72,7 +72,8 @@ final class Codegea_ERP_Admin {
 			$values['stock_to_erp'] = !empty($in['stock_to_erp']) ? 'yes' : 'no';
 		}
 		Codegea_ERP_Settings::update($values);
-		if ($tab === 'conexion' && Codegea_ERP_Settings::is_configured()) {
+		// «Actualizar lista» de Stock guarda lo elegido y vuelve a pedir las bodegas al ERP.
+		if (($tab === 'conexion' || !empty($in['refresh'])) && Codegea_ERP_Settings::is_configured()) {
 			Codegea_ERP_Client::ping();
 		}
 		wp_safe_redirect(self::url($tab, array('saved' => 1)));
@@ -158,7 +159,7 @@ final class Codegea_ERP_Admin {
 	/** Botón «Probar conexión» como formulario propio (se usa en Conexión y en Stock). */
 	public static function ping_button($back, $label = 'Probar conexión', $class = 'button') {
 		self::form_open($back, 'codegea_erp_ping');
-		printf('<button type="submit" class="%s"><span class="dashicons dashicons-update" aria-hidden="true"></span> %s</button></form>', esc_attr($class), esc_html($label));
+		printf('<button type="submit" class="%s cerp-btn-icon"><span class="dashicons dashicons-update" aria-hidden="true"></span>%s</button></form>', esc_attr($class), esc_html($label));
 	}
 
 	/** «hace 5 minutos» a partir de una fecha local de WordPress. */
