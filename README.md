@@ -23,10 +23,10 @@ Conecta una tienda **WooCommerce** con el ERP de Codegea (`codegeaec/crm-erp`, p
 Todas las llamadas son `POST {ERP}/api/plugins/wordpress/webhook/<endpoint>` con el body firmado:
 `X-WC-Signature: sha256=<hmac_sha256(body, secreto)>`.
 
-- `ping` → `{ company, warehouses[], stock_warehouse_code, orders_require_review }`
+- `ping` → `{ company, tenant, warehouses[{ id, code, name, is_main }], stock_warehouse_id, orders_require_review }`
 - `orders` → ver `Codegea_ERP_Orders::payload()` (montos sin impuestos + tasa cobrada por línea, total del pedido,
-  `order_mode`, `warehouse_code`).
-- `stock` → `{ items: [{ sku, stock }], warehouse_code }`
+  `order_mode`, `warehouse_id`).
+- `stock` → `{ items: [{ sku, stock }], warehouse_id }`
 
 El ERP manda el header `X-Codegea-Erp` en sus llamadas a la API REST: así este plugin no le devuelve los cambios
 de stock que hizo el propio ERP.

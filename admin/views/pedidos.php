@@ -3,38 +3,38 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 $s = Codegea_ERP_Settings::all();
-$statuses = array(
-	'processing' => 'Procesando (pagado)',
-	'completed' => 'Completado',
-	'on-hold' => 'En espera (ej. transferencia por confirmar: llega al ERP como borrador)',
-);
+$info = Codegea_ERP_Settings::erp_info();
 ?>
-<p>Cada pedido se envía una vez, cuando pasa a uno de los estados marcados. Si el ERP no responde, se reintenta
-	solo; también se puede reenviar desde el pedido (Acciones del pedido → <em>Enviar al ERP</em>).</p>
+<?php if (!empty($info['orders_require_review'])) : ?>
+	<div class="notice notice-warning inline cerp-notice">
+		<p>En el ERP está activo <strong>«Revisar los pedidos antes de confirmarlos»</strong>: todos los pedidos llegan como borrador, sin importar lo que elijas aquí.</p>
+	</div>
+<?php endif; ?>
 
 <?php Codegea_ERP_Admin::form_open('pedidos'); ?>
-<table class="form-table" role="presentation">
-	<tr>
-		<th scope="row">Qué hacer con un pedido pagado</th>
-		<td>
-			<fieldset>
-				<?php foreach (Codegea_ERP_Settings::ORDER_MODES as $value => $label) : ?>
-					<label><input type="radio" name="order_mode" value="<?php echo esc_attr($value); ?>" <?php checked($s['order_mode'], $value); ?>> <?php echo esc_html($label); ?></label><br>
-				<?php endforeach; ?>
-			</fieldset>
-			<p class="description">Facturar requiere que el cliente tenga cédula/RUC y que el ERP tenga la facturación electrónica configurada; si falta algo, la venta queda confirmada y el aviso se ve en Ventas del ERP.</p>
-		</td>
-	</tr>
-	<tr>
-		<th scope="row">Enviar al pasar a</th>
-		<td>
-			<fieldset>
-				<?php foreach ($statuses as $value => $label) : ?>
-					<label><input type="checkbox" name="order_statuses[]" value="<?php echo esc_attr($value); ?>" <?php checked(in_array($value, (array) $s['order_statuses'], true)); ?>> <?php echo esc_html($label); ?></label><br>
-				<?php endforeach; ?>
-			</fieldset>
-		</td>
-	</tr>
-</table>
-<?php submit_button(); ?>
+<section class="cerp-card">
+	<h2>Qué hacer con un pedido pagado</h2>
+	<div class="cerp-options">
+		<?php foreach (Codegea_ERP_Settings::ORDER_MODES as $value => $mode) : ?>
+			<label class="cerp-option">
+				<input type="radio" name="order_mode" value="<?php echo esc_attr($value); ?>" <?php checked($s['order_mode'], $value); ?>>
+				<span><strong><?php echo esc_html($mode['label']); ?></strong><small><?php echo esc_html($mode['help']); ?></small></span>
+			</label>
+		<?php endforeach; ?>
+	</div>
+</section>
+
+<section class="cerp-card">
+	<h2>Cuándo se envía</h2>
+	<p class="cerp-muted">Cada pedido se envía una sola vez, la primera vez que pasa a uno de estos estados.</p>
+	<div class="cerp-checks">
+		<?php foreach (Codegea_ERP_Settings::ORDER_STATUSES as $value => $status) : ?>
+			<label class="cerp-check">
+				<input type="checkbox" name="order_statuses[]" value="<?php echo esc_attr($value); ?>" <?php checked(in_array($value, (array) $s['order_statuses'], true)); ?>>
+				<span><strong><?php echo esc_html($status['label']); ?></strong> <small><?php echo esc_html($status['help']); ?></small></span>
+			</label>
+		<?php endforeach; ?>
+	</div>
+</section>
+<p class="cerp-actions"><button type="submit" class="button button-primary">Guardar</button></p>
 </form>

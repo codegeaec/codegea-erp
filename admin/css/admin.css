@@ -1,0 +1,107 @@
+/* Codegea ERP — pantallas de WooCommerce → Codegea ERP. Usa los colores del admin de WordPress. */
+.cerp {
+	--cerp-border: #dcdcde;
+	--cerp-muted: #646970;
+	--cerp-radius: 8px;
+	--cerp-accent: var(--wp-admin-theme-color, #2271b1);
+	max-width: 1180px;
+}
+
+.cerp-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin: 16px 0 12px;
+}
+.cerp-brand { display: flex; align-items: center; gap: 12px; }
+.cerp-brand h1 { margin: 0; padding: 0; font-size: 22px; line-height: 1.3; }
+.cerp-brand p { margin: 2px 0 0; color: var(--cerp-muted); }
+.cerp-logo {
+	width: 40px; height: 40px; font-size: 22px; line-height: 40px; text-align: center;
+	border-radius: 10px; background: var(--cerp-accent); color: #fff;
+}
+
+.cerp-pill {
+	display: inline-flex; align-items: center; gap: 6px;
+	padding: 5px 12px; border-radius: 999px; font-weight: 600; font-size: 13px;
+	border: 1px solid transparent;
+}
+.cerp-pill .dashicons { font-size: 16px; width: 16px; height: 16px; }
+.cerp-pill--ok { background: #edfaef; color: #00701a; border-color: #b8e6bf; }
+.cerp-pill--error { background: #fcf0f1; color: #b32d2e; border-color: #f0b8b9; }
+.cerp-pill--off { background: #f6f7f7; color: var(--cerp-muted); border-color: var(--cerp-border); }
+
+.cerp-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--cerp-border); margin: 8px 0 20px; flex-wrap: wrap; }
+.cerp-tab {
+	display: inline-flex; align-items: center; gap: 6px;
+	padding: 10px 14px; margin-bottom: -1px; text-decoration: none; color: var(--cerp-muted);
+	border-bottom: 2px solid transparent; font-weight: 500;
+}
+.cerp-tab:hover { color: #1d2327; }
+.cerp-tab:focus { box-shadow: none; outline: 2px solid var(--cerp-accent); outline-offset: -2px; }
+.cerp-tab.is-active { color: #1d2327; border-bottom-color: var(--cerp-accent); }
+.cerp-tab .dashicons { font-size: 17px; width: 17px; height: 17px; }
+
+.cerp-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
+@media (max-width: 960px) { .cerp-layout { grid-template-columns: 1fr; } }
+
+.cerp-card {
+	background: #fff; border: 1px solid var(--cerp-border); border-radius: var(--cerp-radius);
+	padding: 18px 20px; margin-bottom: 16px;
+}
+.cerp-card h2 { margin: 0 0 12px; font-size: 15px; }
+.cerp-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.cerp-card-head h2 { margin: 0; }
+.cerp-card-head form { margin: 0; }
+.cerp-muted { color: var(--cerp-muted); margin: 0 0 12px; }
+
+.cerp-notice.notice { margin: 0 0 16px; border-radius: 4px; }
+.cerp-card .cerp-notice.notice { margin-bottom: 12px; }
+
+.cerp-field { margin-bottom: 16px; }
+.cerp-field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.cerp-field input.regular-text { width: 100%; max-width: 480px; }
+.cerp-field .description { margin-top: 4px; }
+.cerp-actions { margin: 4px 0 0; }
+.cerp-actions .button-primary { min-height: 34px; padding: 0 16px; }
+.button .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: text-bottom; }
+
+.cerp-options { display: grid; gap: 8px; }
+.cerp-option, .cerp-check {
+	display: flex; align-items: flex-start; gap: 10px;
+	padding: 12px 14px; border: 1px solid var(--cerp-border); border-radius: var(--cerp-radius);
+	cursor: pointer; transition: border-color .15s, background-color .15s;
+}
+.cerp-option:hover, .cerp-check:hover { border-color: #a7aaad; }
+.cerp-option:has(input:checked), .cerp-check:has(input:checked) { border-color: var(--cerp-accent); background: #f0f6fc; }
+.cerp-option input, .cerp-check input { margin-top: 2px; }
+.cerp-option strong, .cerp-check strong { display: block; }
+.cerp-option small, .cerp-check small { display: block; color: var(--cerp-muted); margin-top: 2px; font-size: 12.5px; }
+.cerp-checks { display: grid; gap: 8px; }
+
+.cerp-tag {
+	display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px;
+	background: #f0f6fc; color: var(--cerp-accent); font-style: normal; font-size: 11px; font-weight: 600;
+}
+
+.cerp-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0; }
+.cerp-facts div { background: #f6f7f7; border-radius: 6px; padding: 10px 12px; }
+.cerp-facts dt { color: var(--cerp-muted); font-size: 12px; }
+.cerp-facts dd { margin: 2px 0 0; font-weight: 600; }
+
+.cerp-inline-action { margin-top: -4px; }
+
+.cerp-help h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: 14px; }
+.cerp-help ul { margin: 0; padding-left: 18px; list-style: disc; color: #3c434a; }
+.cerp-help li { margin-bottom: 6px; }
+
+.cerp-empty { text-align: center; padding: 24px 12px; color: var(--cerp-muted); }
+.cerp-empty .dashicons { font-size: 32px; width: 32px; height: 32px; color: #a7aaad; }
+
+.cerp-table td { vertical-align: middle; }
+.cerp-badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+.cerp-badge--ok { background: #edfaef; color: #00701a; }
+.cerp-badge--error { background: #fcf0f1; color: #b32d2e; }
+.cerp-link-danger.button-link { color: #b32d2e; }

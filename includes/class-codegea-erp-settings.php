@@ -6,13 +6,28 @@ if (!defined('ABSPATH')) {
 /** Ajustes del plugin (una sola opción `codegea_erp_settings`). */
 final class Codegea_ERP_Settings {
 	const OPTION = 'codegea_erp_settings';
-	/** Datos que devolvió el ERP en «Probar conexión» (empresa, bodegas). */
+	/** Última respuesta de «Probar conexión» (empresa, bodegas) o su error. */
 	const ERP_INFO = 'codegea_erp_info';
 
 	const ORDER_MODES = array(
-		'draft' => 'Guardar como borrador (se revisa y confirma en el ERP)',
-		'confirm' => 'Confirmar la venta (descuenta el stock del ERP)',
-		'invoice' => 'Confirmar y facturar',
+		'draft' => array(
+			'label' => 'Guardar como borrador',
+			'help' => 'Llega al ERP para revisarla y confirmarla a mano. No descuenta stock todavía.',
+		),
+		'confirm' => array(
+			'label' => 'Confirmar la venta',
+			'help' => 'Queda confirmada y descuenta el stock de la bodega. La factura se hace desde el ERP.',
+		),
+		'invoice' => array(
+			'label' => 'Confirmar y facturar',
+			'help' => 'Además genera la factura. Requiere cédula/RUC del cliente y la facturación del ERP configurada.',
+		),
+	);
+
+	const ORDER_STATUSES = array(
+		'processing' => array('label' => 'Procesando', 'help' => 'Pagado: es el estado habitual de un pedido nuevo.'),
+		'completed' => array('label' => 'Completado', 'help' => 'Para pedidos que se marcan completados sin pasar por Procesando.'),
+		'on-hold' => array('label' => 'En espera', 'help' => 'Ej. transferencia por confirmar: llega como borrador hasta que se pague.'),
 	);
 
 	public static function defaults() {
@@ -21,7 +36,9 @@ final class Codegea_ERP_Settings {
 			'secret' => '',
 			'order_mode' => 'confirm',
 			'order_statuses' => array('processing', 'completed', 'on-hold'),
-			'warehouse_code' => '',
+			// Bodega del ERP: se guarda el id (el código puede cambiar) y el nombre para mostrarlo.
+			'warehouse_id' => 0,
+			'warehouse_name' => '',
 			'stock_to_erp' => 'no',
 		);
 	}
@@ -40,9 +57,15 @@ final class Codegea_ERP_Settings {
 		update_option(self::OPTION, array_merge(self::all(), $values), false);
 	}
 
-	public static function is_connected() {
+	public static function is_configured() {
 		$s = self::all();
 		return $s['erp_url'] !== '' && $s['secret'] !== '';
+	}
+
+	/** Configurado y la última prueba de conexión salió bien. */
+	public static function is_connected() {
+		$info = self::erp_info();
+		return self::is_configured() && !empty($info['ok']);
 	}
 
 	/**
@@ -58,5 +81,26 @@ final class Codegea_ERP_Settings {
 	public static function erp_info() {
 		$info = get_option(self::ERP_INFO, array());
 		return is_array($info) ? $info : array();
+	}
+
+	/** @return array<int, array{id:int,code:string,name:string,is_main:bool}> */
+	public static function warehouses() {
+		$info = self::erp_info();
+		return isset($info['warehouses']) && is_array($info['warehouses']) ? $info['warehouses'] : array();
+	}
+
+	/** Nombre de la bodega con la que trabaja la tienda (la elegida, o la del ERP). */
+	public static function warehouse_label() {
+		$s = self::all();
+		if ((int) $s['warehouse_id'] > 0) {
+			return $s['warehouse_name'] !== '' ? $s['warehouse_name'] : '#' . (int) $s['warehouse_id'];
+		}
+		$info = self::erp_info();
+		foreach (self::warehouses() as $w) {
+			if ((int) $w['id'] === (int) ($info['stock_warehouse_id'] ?? 0)) {
+				return $w['name'] . ' (elegida en el ERP)';
+			}
+		}
+		return 'la bodega por defecto del ERP';
 	}
 }

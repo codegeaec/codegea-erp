@@ -4,44 +4,58 @@ if (!defined('ABSPATH')) {
 }
 $s = Codegea_ERP_Settings::all();
 $info = Codegea_ERP_Settings::erp_info();
+$configured = Codegea_ERP_Settings::is_configured();
+$tested = !empty($info['checked_at']);
 ?>
-<p>La tienda le avisa al ERP de cada pedido y de los cambios de stock. Los datos salen del ERP:
-	<strong>Configuración → Plugins → WordPress / WooCommerce → Pedidos</strong> (URL del webhook y secreto).</p>
+<?php if (!$configured) : ?>
+	<div class="notice notice-info inline cerp-notice">
+		<p><strong>Para conectar la tienda:</strong> en el ERP abre <em>Configuración → Plugins → WordPress / WooCommerce → Pedidos</em>,
+			copia la <strong>URL del ERP</strong> y el <strong>secreto</strong>, pégalos aquí y guarda.</p>
+	</div>
+<?php endif; ?>
 
-<?php Codegea_ERP_Admin::form_open('conexion'); ?>
-<table class="form-table" role="presentation">
-	<tr>
-		<th scope="row"><label for="erp_url">URL del ERP</label></th>
-		<td>
-			<input id="erp_url" name="erp_url" type="url" class="regular-text" value="<?php echo esc_attr($s['erp_url']); ?>" placeholder="https://empresa.codegea.com">
-			<p class="description">La dirección con la que entras al ERP. También sirve pegar la URL completa del webhook.</p>
-		</td>
-	</tr>
-	<tr>
-		<th scope="row"><label for="secret">Secreto</label></th>
-		<td>
-			<input id="secret" name="secret" type="password" class="regular-text" value="" autocomplete="new-password" placeholder="<?php echo $s['secret'] !== '' ? esc_attr('•••••••• (guardado)') : ''; ?>">
-			<p class="description">Firma cada envío para que el ERP sepa que viene de tu tienda. Déjalo vacío para conservar el guardado.</p>
-		</td>
-	</tr>
-</table>
-<?php submit_button('Guardar y probar conexión'); ?>
-</form>
-
-<?php if (Codegea_ERP_Settings::is_connected()) : ?>
-	<h2>Estado</h2>
-	<?php if (!empty($info['company'])) : ?>
-		<p>Conectado con <strong><?php echo esc_html($info['company']); ?></strong>
-			<?php if (!empty($info['checked_at'])) : ?>(comprobado el <?php echo esc_html($info['checked_at']); ?>)<?php endif; ?>.</p>
-		<?php if (!empty($info['orders_require_review'])) : ?>
-			<div class="notice notice-info inline"><p>En el ERP está activo «Revisar los pedidos antes de confirmarlos»: todos los pedidos llegan como borrador, sin importar lo elegido en Pedidos.</p></div>
-		<?php endif; ?>
-	<?php else : ?>
-		<p>Todavía no se probó la conexión.</p>
-	<?php endif; ?>
-	<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-		<?php wp_nonce_field('codegea_erp'); ?>
-		<input type="hidden" name="action" value="codegea_erp_ping">
-		<?php submit_button('Probar conexión', 'secondary', 'submit', false); ?>
+<section class="cerp-card">
+	<h2>Datos de conexión</h2>
+	<?php Codegea_ERP_Admin::form_open('conexion'); ?>
+	<div class="cerp-field">
+		<label for="erp_url">URL del ERP</label>
+		<input id="erp_url" name="erp_url" type="url" class="regular-text" required value="<?php echo esc_attr($s['erp_url']); ?>" placeholder="https://empresa.codegea.com">
+		<p class="description">La dirección con la que entras al ERP.</p>
+	</div>
+	<div class="cerp-field">
+		<label for="secret">Secreto</label>
+		<input id="secret" name="secret" type="password" class="regular-text" autocomplete="new-password" <?php echo $s['secret'] === '' ? 'required' : ''; ?>
+			placeholder="<?php echo $s['secret'] !== '' ? esc_attr('Guardado — escribe uno nuevo solo para cambiarlo') : ''; ?>">
+		<p class="description">Firma cada envío para que el ERP sepa que viene de tu tienda.</p>
+	</div>
+	<p class="cerp-actions"><button type="submit" class="button button-primary">Guardar y probar conexión</button></p>
 	</form>
+</section>
+
+<?php if ($configured) : ?>
+	<section class="cerp-card">
+		<div class="cerp-card-head">
+			<h2>Estado</h2>
+			<?php Codegea_ERP_Admin::ping_button('conexion', $tested ? 'Probar de nuevo' : 'Probar conexión'); ?>
+		</div>
+		<?php if (!$tested) : ?>
+			<p class="cerp-muted">Todavía no se probó la conexión.</p>
+		<?php elseif (!empty($info['ok'])) : ?>
+			<div class="notice notice-success inline cerp-notice">
+				<p><strong>Conectado<?php echo !empty($info['company']) ? ' con ' . esc_html($info['company']) : ''; ?>.</strong>
+					Los pedidos y el stock ya llegan al ERP.</p>
+			</div>
+			<dl class="cerp-facts">
+				<?php if (!empty($info['tenant'])) : ?><div><dt>Empresa en el ERP</dt><dd><?php echo esc_html($info['tenant']); ?></dd></div><?php endif; ?>
+				<div><dt>Bodegas disponibles</dt><dd><?php echo (int) count(Codegea_ERP_Settings::warehouses()); ?></dd></div>
+				<div><dt>Bodega de la tienda</dt><dd><?php echo esc_html(Codegea_ERP_Settings::warehouse_label()); ?> · <a href="<?php echo esc_url(Codegea_ERP_Admin::url('stock')); ?>">cambiar</a></dd></div>
+				<div><dt>Comprobado</dt><dd><?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'])); ?></dd></div>
+			</dl>
+		<?php else : ?>
+			<div class="notice notice-error inline cerp-notice">
+				<p><strong>No se pudo conectar.</strong> <?php echo esc_html($info['error'] ?? ''); ?></p>
+			</div>
+			<p class="cerp-muted">Último intento <?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'])); ?>. Los pedidos se guardan y se reintentan solos cuando vuelva la conexión.</p>
+		<?php endif; ?>
+	</section>
 <?php endif; ?>

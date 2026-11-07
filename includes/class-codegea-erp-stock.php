@@ -70,7 +70,7 @@ final class Codegea_ERP_Stock {
 		}
 		$data = array(
 			'items' => array(array('sku' => $product->get_sku(), 'stock' => (float) $product->get_stock_quantity())),
-			'warehouse_code' => (string) Codegea_ERP_Settings::get('warehouse_code'),
+			'warehouse_id' => (int) Codegea_ERP_Settings::get('warehouse_id') ?: null,
 		);
 		$result = Codegea_ERP_Client::post('stock', $data);
 		Codegea_ERP_Log::add('stock', $product->get_sku(), $result['ok'], $result['ok'] ? 'Stock ' . $product->get_stock_quantity() : $result['error']);

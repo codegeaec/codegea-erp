@@ -52,7 +52,7 @@ final class Codegea_ERP_Orders {
 
 	public static function send($order_id, $attempt = 0) {
 		$order = wc_get_order($order_id);
-		if (!$order || !Codegea_ERP_Settings::is_connected()) {
+		if (!$order || !Codegea_ERP_Settings::is_configured()) {
 			return;
 		}
 		$result = Codegea_ERP_Client::post('orders', self::payload($order));
@@ -118,9 +118,9 @@ final class Codegea_ERP_Orders {
 			'total' => (float) $order->get_total(),
 			'notes' => $order->get_customer_note(),
 		);
-		$warehouse = (string) Codegea_ERP_Settings::get('warehouse_code');
-		if ($warehouse !== '') {
-			$payload['warehouse_code'] = $warehouse;
+		$warehouse = (int) Codegea_ERP_Settings::get('warehouse_id');
+		if ($warehouse > 0) {
+			$payload['warehouse_id'] = $warehouse;
 		}
 		return apply_filters('codegea_erp_order_payload', $payload, $order);
 	}
