@@ -6,11 +6,15 @@ if (!defined('ABSPATH')) {
 /**
  * Pedidos → ERP. Al pasar un pedido a uno de los estados elegidos se encola el envío con Action Scheduler
  * (incluido en WooCommerce): el checkout no espera al ERP y, si el ERP no responde 2xx, se reintenta
- * (1, 5, 15, 60 y 180 minutos). El ERP descarta duplicados por `wc_order_id`, así que reenviar es seguro.
+ * (1, 5, 15, 60 y 180 minutos). El ERP descarta duplicados por `wc_order_id`, así que reenviar es seguro; si
+ * el pedido había llegado sin pagar y ya se pagó, el ERP confirma (o factura) la venta que estaba en borrador.
  */
 final class Codegea_ERP_Orders {
 	const ACTION = 'codegea_erp_send_order';
 	const SENT_META = '_codegea_erp_sent';
+	/** Estado con el que se envió el pedido (para volver a avisar cuando un pedido sin pagar se paga). */
+	const SENT_STATUS_META = '_codegea_erp_sent_status';
+	const PAID_STATUSES = array('processing', 'completed');
 	const RETRY_MINUTES = array(1, 5, 15, 60, 180);
 
 	public static function init() {
@@ -26,8 +30,16 @@ final class Codegea_ERP_Orders {
 		}
 		$order = wc_get_order($order_id);
 		// Un pedido que ya llegó al ERP no se reenvía solo por cambiar de estado (ej. procesando → completado).
-		if (!$order || $order->get_meta(self::SENT_META)) {
+		if (!$order) {
 			return;
+		}
+		// Ya enviado: solo se vuelve a avisar si llegó sin pagar (ej. «En espera») y ahora se pagó, para que el
+		// ERP confirme la venta que quedó en borrador. Procesando → Completado no se reenvía.
+		if ($order->get_meta(self::SENT_META)) {
+			$was_paid = in_array((string) $order->get_meta(self::SENT_STATUS_META), self::PAID_STATUSES, true);
+			if ($was_paid || !in_array($to, self::PAID_STATUSES, true)) {
+				return;
+			}
 		}
 		self::enqueue($order_id, 0, 0);
 	}
@@ -59,6 +71,7 @@ final class Codegea_ERP_Orders {
 		if ($result['ok']) {
 			$erp_order = is_array($result['body']) ? ($result['body']['orderId'] ?? null) : null;
 			$order->update_meta_data(self::SENT_META, current_time('mysql'));
+			$order->update_meta_data(self::SENT_STATUS_META, $order->get_status());
 			$order->save();
 			$order->add_order_note($erp_order ? sprintf('Pedido enviado al ERP (orden #%d).', $erp_order) : 'Pedido enviado al ERP.');
 			Codegea_ERP_Log::add('pedido', '#' . $order_id, true, $erp_order ? 'Orden #' . $erp_order : '');
