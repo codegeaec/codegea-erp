@@ -1,0 +1,39 @@
+# Codegea ERP — plugin de WordPress
+
+Conecta una tienda **WooCommerce** con el ERP de Codegea (`codegeaec/crm-erp`, plugin `wordpress` del ERP).
+
+| Dirección | Qué viaja | Cómo |
+|---|---|---|
+| Tienda → ERP | Pedidos pagados | Este plugin (webhook firmado, reintentos con Action Scheduler) |
+| Tienda → ERP | Stock cambiado a mano en WooCommerce (opcional) | Este plugin |
+| ERP → Tienda | Productos, precios, stock, marcas, categorías, tags, fotos | El ERP, por la API REST de WooCommerce |
+
+## Pantallas (WooCommerce → Codegea ERP)
+
+- **Conexión**: URL del ERP y secreto (los da el ERP en Configuración → Plugins → WordPress / WooCommerce →
+  Pedidos). «Probar conexión» trae el nombre de la empresa y sus bodegas.
+- **Pedidos**: qué hacer con un pedido pagado — borrador, confirmar la venta (descuenta stock) o confirmar y
+  facturar — y en qué estados se envía. Cada pedido tiene la acción «Enviar al ERP».
+- **Stock**: de qué bodega del ERP sale el stock de la tienda y si los cambios hechos a mano en WooCommerce se
+  pasan al ERP.
+- **Registro**: los últimos 50 envíos.
+
+## Contrato con el ERP
+
+Todas las llamadas son `POST {ERP}/api/plugins/wordpress/webhook/<endpoint>` con el body firmado:
+`X-WC-Signature: sha256=<hmac_sha256(body, secreto)>`.
+
+- `ping` → `{ company, warehouses[], stock_warehouse_code, orders_require_review }`
+- `orders` → ver `Codegea_ERP_Orders::payload()` (montos sin impuestos + tasa cobrada por línea, total del pedido,
+  `order_mode`, `warehouse_code`).
+- `stock` → `{ items: [{ sku, stock }], warehouse_code }`
+
+El ERP manda el header `X-Codegea-Erp` en sus llamadas a la API REST: así este plugin no le devuelve los cambios
+de stock que hizo el propio ERP.
+
+Filtros: `codegea_erp_order_payload`, `codegea_erp_client_ruc` (cédula/RUC guardada en otro campo del checkout).
+
+## Desarrollo
+
+El laboratorio del ERP (`pnpm wp:lab` en crm-erp) instala este plugin desde `../codegea-erp`. El zip que se
+descarga desde el ERP se genera con `pnpm wp:plugin:pack` en crm-erp (usa `git archive` de este repo).
