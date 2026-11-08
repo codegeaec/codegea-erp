@@ -138,7 +138,7 @@ final class Codegea_ERP_Admin {
 		?>
 		<div class="cerp-header">
 			<div class="cerp-brand">
-				<span class="cerp-logo dashicons dashicons-randomize" aria-hidden="true"></span>
+				<img class="cerp-logo" src="<?php echo esc_url(plugins_url('admin/images/codegea-mark.svg', CODEGEA_ERP_FILE)); ?>" alt="" width="40" height="40">
 				<div>
 					<h1>Codegea ERP</h1>
 					<p>Pedidos y stock de tu tienda, al día en el ERP.</p>
