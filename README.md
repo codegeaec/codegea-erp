@@ -1,6 +1,8 @@
 # Codegea ERP — plugin de WordPress
 
-Conecta una tienda **WooCommerce** con el ERP de Codegea (`codegeaec/crm-erp`, plugin `wordpress` del ERP).
+Conecta una tienda **WooCommerce** con el ERP de [Codegea](https://codegea.com) (`codegeaec/crm-erp`, plugin `wordpress` del ERP).
+
+**Descargar:** [último release](https://github.com/codegeaec/codegea-erp/releases/latest/download/codegea-erp.zip) · Web: [codegea.com](https://codegea.com)
 
 | Dirección | Qué viaja | Cómo |
 |---|---|---|
@@ -35,5 +37,15 @@ Filtros: `codegea_erp_order_payload`, `codegea_erp_client_ruc` (cédula/RUC guar
 
 ## Desarrollo
 
-El laboratorio del ERP (`pnpm wp:lab` en crm-erp) instala este plugin desde `../codegea-erp`. El zip que se
-descarga desde el ERP se genera con `pnpm wp:plugin:pack` en crm-erp (usa `git archive` de este repo).
+El laboratorio del ERP (`pnpm wp:lab` en crm-erp) instala este plugin desde `../codegea-erp`.
+
+## Publicar una versión
+
+1. Subir la versión en `codegea-erp.php` (cabecera `Version` y `CODEGEA_ERP_VERSION`) y en `readme.txt`
+   (`Stable tag` + Changelog).
+2. `git tag vX.Y.Z && git push --tags`: el workflow `Release` comprueba que las versiones coincidan y publica
+   `codegea-erp.zip`.
+3. El ERP descarga siempre el último:
+   `https://github.com/codegeaec/codegea-erp/releases/latest/download/codegea-erp.zip`.
+
+Licencia GPL v2 o posterior (requisito del directorio de WordPress.org; ver `readme.txt` y `LICENSE`).

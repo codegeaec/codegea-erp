@@ -1,0 +1,5 @@
+# Lo que no va en el zip del plugin (git archive / releases).
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/README.md export-ignore

@@ -5,12 +5,14 @@
  * Description: Conecta WooCommerce con el ERP de Codegea: envía los pedidos (borrador, venta confirmada o facturada) y mantiene el stock alineado con la bodega del ERP.
  * Version: 1.0.0
  * Author: Codegea
+ * Author URI: https://codegea.com
  * Requires at least: 6.4
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
  * WC requires at least: 8.0
  * Text Domain: codegea-erp
- * License: Proprietary
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) {
