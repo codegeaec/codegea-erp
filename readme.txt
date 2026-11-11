@@ -30,7 +30,7 @@ The settings screens are in Spanish.
 This plugin connects to the **Codegea ERP** instance configured by the store owner (WooCommerce → Codegea ERP → Conexión). Nothing is sent until an ERP address and secret are saved.
 
 * **What is sent and when**
-  * When an order reaches one of the selected statuses: order number, status, payment method, currency, billing name, email, phone and tax ID, line items (SKU, quantity, prices, discount, tax rate), shipping and total, and the customer note.
+  * When an order reaches one of the selected statuses: order number, status, payment method, currency, billing name, email, phone and tax ID, line items (SKU, quantity, prices, discount, tax rate), coupons used, shipping and total, and the customer note.
   * When stock is changed by hand in WooCommerce (only if enabled): product SKU and new stock quantity.
   * When a customer ticks the newsletter checkbox at checkout or submits the newsletter form (only if used): email, name, the consent text they accepted and their IP address.
   * When testing the connection: the store URL and the plugin version.
@@ -62,6 +62,7 @@ No. Stock reductions caused by orders are not sent: the ERP deducts them when it
 
 = 1.1.0 =
 * Newsletter: optional checkbox at checkout (classic and block checkout) and the `[codegea_erp_newsletter]` signup form shortcode, both with double opt-in through the ERP.
+* Orders now include the coupons used and their discount, so the ERP can count coupon uses (Loyalty plugin). Coupons created in the ERP are added to WooCommerce through its REST API.
 
 = 1.0.0 =
 * First release: orders (draft, confirm, invoice), stock in both directions, connection test, warehouse selection and send log.

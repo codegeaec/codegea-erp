@@ -85,6 +85,19 @@ final class Codegea_ERP_Orders {
 		$order->add_order_note('No se pudo enviar el pedido al ERP: ' . $result['error']);
 	}
 
+	/** Cupones del pedido con lo que descontó cada uno (con impuestos): el ERP registra su uso en Fidelidad. */
+	private static function coupons(WC_Order $order) {
+		$coupons = array();
+		foreach ($order->get_items('coupon') as $item) {
+			/** @var WC_Order_Item_Coupon $item */
+			$coupons[] = array(
+				'code' => strtoupper((string) $item->get_code()),
+				'discount' => round((float) $item->get_discount() + (float) $item->get_discount_tax(), 2),
+			);
+		}
+		return $coupons;
+	}
+
 	/**
 	 * Formato que espera el ERP (`POST /api/plugins/wordpress/webhook/orders`). Montos sin impuestos y la tasa
 	 * que cobró la tienda por línea, para que la venta del ERP sume lo mismo que pagó el cliente.
@@ -130,6 +143,7 @@ final class Codegea_ERP_Orders {
 			'shipping_tax' => (float) $order->get_shipping_tax(),
 			'total' => (float) $order->get_total(),
 			'notes' => $order->get_customer_note(),
+			'coupons' => self::coupons($order),
 		);
 		$warehouse = (int) Codegea_ERP_Settings::get('warehouse_id');
 		if ($warehouse > 0) {
