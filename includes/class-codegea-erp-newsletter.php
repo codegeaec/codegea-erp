@@ -15,6 +15,8 @@ final class Codegea_ERP_Newsletter {
 	/** Id del campo del checkout de bloques (Additional Checkout Fields API, WooCommerce 8.9+). */
 	const BLOCK_FIELD = 'codegea-erp/newsletter';
 	const DONE_META = '_codegea_erp_newsletter';
+	/** Vuelve a preguntar al ERP si el newsletter está activo (Action Scheduler). */
+	const RECHECK_ACTION = 'codegea_erp_newsletter_recheck';
 	const RETRY_MINUTES = array(1, 5, 15);
 	const DEFAULT_LABEL = 'Quiero recibir novedades y ofertas por correo. Puedo darme de baja cuando quiera.';
 
@@ -23,7 +25,8 @@ final class Codegea_ERP_Newsletter {
 		add_shortcode('codegea_erp_newsletter', array(__CLASS__, 'shortcode'));
 		add_action('admin_post_nopriv_codegea_erp_newsletter', array(__CLASS__, 'form_submit'));
 		add_action('admin_post_codegea_erp_newsletter', array(__CLASS__, 'form_submit'));
-		if (Codegea_ERP_Settings::get('newsletter_checkout') !== 'yes') {
+		add_action(self::RECHECK_ACTION, array('Codegea_ERP_Client', 'ping'));
+		if (Codegea_ERP_Settings::get('newsletter_checkout') !== 'yes' || !self::available()) {
 			return;
 		}
 		// Checkout clásico.
@@ -32,6 +35,37 @@ final class Codegea_ERP_Newsletter {
 		// Checkout de bloques.
 		add_action('woocommerce_init', array(__CLASS__, 'register_block_field'));
 		add_action('woocommerce_store_api_checkout_order_processed', array(__CLASS__, 'on_block_checkout'));
+	}
+
+	/**
+	 * Conectada y con el plugin Newsletter activo en el ERP (lo dice «Probar conexión»; si todavía no se sabe,
+	 * se ofrece). Apagado en el ERP, la casilla y el formulario no se muestran; cada 12 horas se vuelve a
+	 * consultar en segundo plano por si lo activaron.
+	 */
+	public static function available() {
+		if (!Codegea_ERP_Settings::is_connected()) {
+			return false;
+		}
+		$info = Codegea_ERP_Settings::erp_info();
+		if (!array_key_exists('newsletter', $info) || !empty($info['newsletter'])) {
+			return true;
+		}
+		$stale = strtotime((string) ($info['checked_at'] ?? '')) < current_time('timestamp') - 12 * HOUR_IN_SECONDS;
+		if ($stale && function_exists('as_enqueue_async_action') && !get_transient(self::RECHECK_ACTION)) {
+			set_transient(self::RECHECK_ACTION, 1, HOUR_IN_SECONDS);
+			as_enqueue_async_action(self::RECHECK_ACTION, array(), 'codegea-erp');
+		}
+		return false;
+	}
+
+	/** El ERP dice en cada alta si el newsletter sigue activo: se guarda para ocultar o volver a mostrar. */
+	private static function remember_available($active) {
+		$info = Codegea_ERP_Settings::erp_info();
+		if (!$info || ($info['newsletter'] ?? null) === $active) {
+			return;
+		}
+		$info['newsletter'] = $active;
+		update_option(Codegea_ERP_Settings::ERP_INFO, $info, false);
 	}
 
 	public static function label() {
@@ -114,6 +148,9 @@ final class Codegea_ERP_Newsletter {
 		$result = Codegea_ERP_Client::post('newsletter', $data, 15);
 		$body = is_array($result['body']) ? $result['body'] : array();
 		$ok = $result['ok'] && !empty($body['ok']);
+		if ($result['ok'] && array_key_exists('newsletter', $body)) {
+			self::remember_available((bool) $body['newsletter']);
+		}
 		$message = $result['ok'] ? (string) ($body['message'] ?? '') : $result['error'];
 		Codegea_ERP_Log::add('newsletter', (string) ($data['email'] ?? ''), $ok, $message);
 		return array('ok' => $ok, 'code' => (int) $result['code'], 'message' => $message);
@@ -123,6 +160,9 @@ final class Codegea_ERP_Newsletter {
 
 	/** [codegea_erp_newsletter button="Suscribirme" name="yes"] */
 	public static function shortcode($atts) {
+		if (!self::available()) {
+			return ''; // Newsletter apagado en el ERP: no se muestra un formulario que no funcionaría.
+		}
 		$atts = shortcode_atts(array('button' => 'Suscribirme', 'name' => 'yes'), $atts, 'codegea_erp_newsletter');
 		wp_enqueue_style('codegea-erp-newsletter', plugins_url('public/css/newsletter.css', CODEGEA_ERP_FILE), array(), CODEGEA_ERP_VERSION);
 		$notice = '';

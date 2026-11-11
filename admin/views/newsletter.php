@@ -12,7 +12,8 @@ $known = Codegea_ERP_Settings::is_connected() && array_key_exists('newsletter', 
 	</div>
 <?php elseif ($known && empty($info['newsletter'])) : ?>
 	<div class="notice notice-warning inline cerp-notice">
-		<p>El plugin <strong>Newsletter</strong> no está activo en el ERP: las suscripciones se van a rechazar. Actívalo en el ERP (Configuración → Plugins) y vuelve a probar la conexión.</p>
+		<p>El plugin <strong>Newsletter</strong> no está activo en el ERP, así que la casilla del checkout y el formulario están ocultos en la tienda. Actívalo en el ERP (Configuración → Plugins) y prueba la conexión otra vez; si no, la tienda vuelve a consultarlo sola cada 12 horas.</p>
+		<?php Codegea_ERP_Admin::ping_button('newsletter'); ?>
 	</div>
 <?php elseif (!$known) : ?>
 	<div class="notice notice-info inline cerp-notice">
