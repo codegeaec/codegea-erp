@@ -18,7 +18,7 @@ $entries = Codegea_ERP_Log::all();
 	<?php if (!$entries) : ?>
 		<div class="cerp-empty">
 			<span class="dashicons dashicons-clipboard" aria-hidden="true"></span>
-			<p>Todavía no hay envíos. Aquí verás cada pedido y cambio de stock que se manda al ERP.</p>
+			<p>Todavía no hay envíos. Aquí verás cada pedido, cambio de stock y suscripción al newsletter que se manda al ERP.</p>
 		</div>
 	<?php else : ?>
 		<table class="widefat striped cerp-table">

@@ -3,13 +3,14 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-/** Pantallas en WooCommerce → Codegea ERP: Conexión, Pedidos, Stock y Registro. */
+/** Pantallas en WooCommerce → Codegea ERP: Conexión, Pedidos, Stock, Newsletter y Registro. */
 final class Codegea_ERP_Admin {
 	const PAGE = 'codegea-erp';
 	const TABS = array(
 		'conexion' => array('label' => 'Conexión', 'icon' => 'admin-links'),
 		'pedidos' => array('label' => 'Pedidos', 'icon' => 'cart'),
 		'stock' => array('label' => 'Stock', 'icon' => 'archive'),
+		'newsletter' => array('label' => 'Newsletter', 'icon' => 'email-alt'),
 		'registro' => array('label' => 'Registro', 'icon' => 'list-view'),
 	);
 
@@ -70,6 +71,9 @@ final class Codegea_ERP_Admin {
 			$values['warehouse_id'] = $name !== '' ? $id : 0;
 			$values['warehouse_name'] = $name;
 			$values['stock_to_erp'] = !empty($in['stock_to_erp']) ? 'yes' : 'no';
+		} elseif ($tab === 'newsletter') {
+			$values['newsletter_checkout'] = !empty($in['newsletter_checkout']) ? 'yes' : 'no';
+			$values['newsletter_label'] = sanitize_text_field($in['newsletter_label'] ?? '');
 		}
 		Codegea_ERP_Settings::update($values);
 		// «Actualizar lista» de Stock guarda lo elegido y vuelve a pedir las bodegas al ERP.

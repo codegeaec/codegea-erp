@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Codegea ERP
  * Plugin URI: https://codegea.com
- * Description: Conecta WooCommerce con el ERP de Codegea: envía los pedidos (borrador, venta confirmada o facturada) y mantiene el stock alineado con la bodega del ERP.
- * Version: 1.0.0
+ * Description: Conecta WooCommerce con el ERP de Codegea: envía los pedidos (borrador, venta confirmada o facturada) mantiene el stock alineado con la bodega del ERP y suma suscriptores a su newsletter.
+ * Version: 1.1.0
  * Author: Codegea
  * Author URI: https://codegea.com
  * Requires at least: 6.4
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('CODEGEA_ERP_VERSION', '1.0.0');
+define('CODEGEA_ERP_VERSION', '1.1.0');
 define('CODEGEA_ERP_FILE', __FILE__);
 define('CODEGEA_ERP_DIR', plugin_dir_path(__FILE__));
 
@@ -28,6 +28,7 @@ require_once CODEGEA_ERP_DIR . 'includes/class-codegea-erp-log.php';
 require_once CODEGEA_ERP_DIR . 'includes/class-codegea-erp-client.php';
 require_once CODEGEA_ERP_DIR . 'includes/class-codegea-erp-orders.php';
 require_once CODEGEA_ERP_DIR . 'includes/class-codegea-erp-stock.php';
+require_once CODEGEA_ERP_DIR . 'includes/class-codegea-erp-newsletter.php';
 
 // Compatible con el almacenamiento de pedidos de alto rendimiento (HPOS) de WooCommerce.
 add_action('before_woocommerce_init', function () {
@@ -42,6 +43,7 @@ add_action('plugins_loaded', function () {
 	}
 	Codegea_ERP_Orders::init();
 	Codegea_ERP_Stock::init();
+	Codegea_ERP_Newsletter::init();
 	if (is_admin()) {
 		require_once CODEGEA_ERP_DIR . 'admin/class-codegea-erp-admin.php';
 		Codegea_ERP_Admin::init();

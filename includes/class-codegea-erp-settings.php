@@ -40,6 +40,9 @@ final class Codegea_ERP_Settings {
 			'warehouse_id' => 0,
 			'warehouse_name' => '',
 			'stock_to_erp' => 'no',
+			// Casilla «Quiero recibir novedades» en el checkout (newsletter del ERP).
+			'newsletter_checkout' => 'no',
+			'newsletter_label' => '',
 		);
 	}
 

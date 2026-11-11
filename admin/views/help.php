@@ -28,6 +28,14 @@ $help = array(
 			'Lo que cambia el ERP no se le devuelve: no hay ciclos.',
 		),
 	),
+	'newsletter' => array(
+		'title' => 'Sobre el newsletter',
+		'items' => array(
+			'Quien se suscribe recibe un correo del ERP para confirmar: nadie queda suscrito sin confirmar su correo.',
+			'Los contactos aparecen en el ERP, en Newsletter → Contactos, con origen «Tienda».',
+			'Cada alta queda en la pestaña Registro.',
+		),
+	),
 	'registro' => array(
 		'title' => 'Sobre el registro',
 		'items' => array(

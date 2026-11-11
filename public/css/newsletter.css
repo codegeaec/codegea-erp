@@ -1,0 +1,9 @@
+/* Formulario del shortcode [codegea_erp_newsletter]: neutro, hereda la tipografía y los colores del tema. */
+.cerp-nl { display: grid; gap: 10px; max-width: 440px; }
+.cerp-nl input[type="email"], .cerp-nl input[type="text"] { width: 100%; box-sizing: border-box; }
+.cerp-nl .cerp-nl-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.cerp-nl-consent { display: flex; gap: 8px; align-items: flex-start; font-size: 0.875em; line-height: 1.4; }
+.cerp-nl-consent input { margin-top: 0.2em; flex: none; }
+.cerp-nl-notice { margin: 0; padding: 10px 12px; border-radius: 6px; font-size: 0.9em; }
+.cerp-nl-notice--ok { background: #ecfdf3; color: #05603a; border: 1px solid #abefc6; }
+.cerp-nl-notice--error { background: #fef3f2; color: #b42318; border: 1px solid #fecdca; }
