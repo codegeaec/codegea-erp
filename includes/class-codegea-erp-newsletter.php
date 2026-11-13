@@ -206,7 +206,7 @@ final class Codegea_ERP_Newsletter {
 				'name' => sanitize_text_field($in['name'] ?? ''),
 				'consent' => !empty($in['consent']),
 				'consent_text' => self::label(),
-				'ip' => class_exists('WC_Geolocation') ? WC_Geolocation::get_ip_address() : sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? ''),
+				'ip' => class_exists('WC_Geolocation') ? WC_Geolocation::get_ip_address() : sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? '')),
 			));
 			if (!$result['ok'] && ($result['code'] === 0 || $result['code'] >= 500 || $result['message'] === '')) {
 				$result['message'] = 'No pudimos registrar tu suscripción. Intenta de nuevo más tarde.';
