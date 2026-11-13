@@ -146,10 +146,10 @@ final class Nimbus_ERP_Admin {
 		?>
 		<div class="cerp-header">
 			<div class="cerp-brand">
-				<img class="cerp-logo" src="<?php echo esc_url(plugins_url('admin/images/codegea-mark.svg', NIMBUS_ERP_FILE)); ?>" alt="Codegea" width="40" height="40">
+				<img class="cerp-logo" src="<?php echo esc_url(plugins_url('admin/images/nimbus-mark.svg', NIMBUS_ERP_FILE)); ?>" alt="Nimbus ERP" width="40" height="40">
 				<div>
 					<h1>Nimbus ERP</h1>
-					<p>Pedidos y stock de tu tienda, al día en el ERP · por Codegea</p>
+					<p>Pedidos y stock de tu tienda, al día en el ERP · <a href="https://codegea.com" target="_blank" rel="noopener">por Codegea</a></p>
 				</div>
 			</div>
 			<span class="cerp-pill cerp-pill--<?php echo esc_attr($pill[0]); ?>"><span class="dashicons dashicons-<?php echo esc_attr($pill[1]); ?>" aria-hidden="true"></span><?php echo esc_html($pill[2]); ?></span>

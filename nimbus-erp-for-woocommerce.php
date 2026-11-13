@@ -3,7 +3,7 @@
  * Plugin Name: Nimbus ERP for WooCommerce
  * Plugin URI: https://github.com/codegeaec/nimbus-erp-for-woocommerce
  * Description: Conecta WooCommerce con Nimbus ERP: envía los pedidos (borrador, venta confirmada o facturada) mantiene el stock alineado con la bodega del ERP y suma suscriptores a su newsletter.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Codegea
  * Author URI: https://codegea.com
  * Requires at least: 6.4
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('NIMBUS_ERP_VERSION', '1.2.0');
+define('NIMBUS_ERP_VERSION', '1.2.1');
 define('NIMBUS_ERP_FILE', __FILE__);
 define('NIMBUS_ERP_DIR', plugin_dir_path(__FILE__));
 
