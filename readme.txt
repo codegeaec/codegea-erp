@@ -1,24 +1,24 @@
-=== Codegea ERP ===
+=== Nimbus ERP for WooCommerce ===
 Contributors: codegea
 Tags: woocommerce, erp, inventory, orders, invoicing
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Sends WooCommerce orders to the Codegea ERP as sales and keeps the store stock in sync with an ERP warehouse.
+Sends WooCommerce orders to Nimbus ERP as sales and keeps the store stock in sync with an ERP warehouse.
 
 == Description ==
 
-Codegea ERP links a WooCommerce store with the Codegea ERP (https://codegea.com). It is useful only together with a Codegea ERP account.
+Nimbus ERP for WooCommerce links a WooCommerce store with Nimbus ERP, developed by Codegea (https://codegea.com). It is useful only together with a Nimbus ERP account.
 
 * **Orders**: every paid order is sent to the ERP as a sale. Choose whether it arrives as a draft, a confirmed sale (stock is deducted) or a confirmed and invoiced sale. Taxes, coupons and shipping are sent as charged, so the ERP sale matches what the customer paid.
 * **Stock**: the store shows the stock of one ERP warehouse. Optionally, stock changes made by hand in WooCommerce are passed to the ERP.
 * **Reliable**: sends run in the background with Action Scheduler (bundled with WooCommerce) and are retried if the ERP does not answer. Every order can be re-sent from its screen (Order actions → Send to ERP).
-* **Newsletter**: an optional "subscribe to our newsletter" checkbox at checkout (classic and block checkout) and the `[codegea_erp_newsletter]` shortcode with a signup form. The ERP sends a confirmation email (double opt-in) before anyone is subscribed.
+* **Newsletter**: an optional "subscribe to our newsletter" checkbox at checkout (classic and block checkout) and the `[nimbus_erp_newsletter]` shortcode with a signup form. The ERP sends a confirmation email (double opt-in) before anyone is subscribed.
 * **Log**: the last 50 sends, to diagnose problems without server access.
 
 Products, prices, photos, brands, categories and stock are sent from the ERP to the store through the WooCommerce REST API; this plugin covers the other direction.
@@ -27,7 +27,7 @@ The settings screens are in Spanish.
 
 == External services ==
 
-This plugin connects to the **Codegea ERP** instance configured by the store owner (WooCommerce → Codegea ERP → Conexión). Nothing is sent until an ERP address and secret are saved.
+This plugin connects to the **Nimbus ERP** instance configured by the store owner (WooCommerce → Nimbus ERP → Conexión). Nothing is sent until an ERP address and secret are saved.
 
 * **What is sent and when**
   * When an order reaches one of the selected statuses: order number, status, payment method, currency, billing name, email, phone and tax ID, line items (SKU, quantity, prices, discount, tax rate), coupons used, shipping and total, and the customer note.
@@ -40,15 +40,15 @@ This plugin connects to the **Codegea ERP** instance configured by the store own
 == Installation ==
 
 1. Install and activate the plugin (WooCommerce must be active).
-2. In the Codegea ERP, open Configuración → Plugins → WordPress / WooCommerce → Pedidos and copy the ERP address and the secret.
-3. In WordPress, go to WooCommerce → Codegea ERP → Conexión, paste them and click «Conectar con el ERP».
+2. In Nimbus ERP, open Configuración → Plugins → WordPress / WooCommerce → Pedidos and copy the ERP address and the secret.
+3. In WordPress, go to WooCommerce → Nimbus ERP → Conexión, paste them and click «Conectar con el ERP».
 4. In the Pedidos and Stock tabs, choose how orders arrive and which ERP warehouse feeds the store.
 
 == Frequently Asked Questions ==
 
-= Does it work without the Codegea ERP? =
+= Does it work without Nimbus ERP? =
 
-No. It only sends data to a Codegea ERP account.
+No. It only sends data to a Nimbus ERP account.
 
 = Can an order be duplicated in the ERP? =
 
@@ -59,6 +59,9 @@ No. The ERP identifies each order by its WooCommerce ID; re-sending it is safe. 
 No. Stock reductions caused by orders are not sent: the ERP deducts them when it receives the order. Changes made by the ERP itself are not sent back either.
 
 == Changelog ==
+
+= 1.2.0 =
+* Renamed from «Codegea ERP» to «Nimbus ERP for WooCommerce». Settings, send log and sent orders of an existing Codegea ERP install are kept, and the old `[codegea_erp_newsletter]` shortcode still works.
 
 = 1.1.0 =
 * Newsletter: optional checkbox at checkout (classic and block checkout) and the `[codegea_erp_newsletter]` signup form shortcode, both with double opt-in through the ERP.

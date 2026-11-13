@@ -1,4 +1,4 @@
-/* Formulario del shortcode [codegea_erp_newsletter]: neutro, hereda la tipografía y los colores del tema. */
+/* Formulario del shortcode [nimbus_erp_newsletter]: neutro, hereda la tipografía y los colores del tema. */
 .cerp-nl { display: grid; gap: 10px; max-width: 440px; }
 .cerp-nl input[type="email"], .cerp-nl input[type="text"] { width: 100%; box-sizing: border-box; }
 .cerp-nl .cerp-nl-trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }

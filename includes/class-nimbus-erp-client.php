@@ -7,23 +7,23 @@ if (!defined('ABSPATH')) {
  * Llamadas al ERP. Cada body va firmado con HMAC-SHA256 y el secreto compartido (header X-WC-Signature);
  * es lo que el ERP valida para aceptar la llamada.
  */
-final class Codegea_ERP_Client {
+final class Nimbus_ERP_Client {
 	const BASE_PATH = '/api/plugins/wordpress/webhook/';
 
 	/**
 	 * @return array{ok:bool,code:int,body:mixed,error:string}
 	 */
 	public static function post($endpoint, array $data, $timeout = 30) {
-		if (!Codegea_ERP_Settings::is_configured()) {
+		if (!Nimbus_ERP_Settings::is_configured()) {
 			return array('ok' => false, 'code' => 0, 'body' => null, 'error' => 'Falta la URL del ERP o el secreto.');
 		}
 		$body = wp_json_encode($data);
-		$response = wp_remote_post(Codegea_ERP_Settings::erp_base_url() . self::BASE_PATH . $endpoint, array(
+		$response = wp_remote_post(Nimbus_ERP_Settings::erp_base_url() . self::BASE_PATH . $endpoint, array(
 			'timeout' => $timeout,
 			'headers' => array(
 				'Content-Type' => 'application/json',
-				'X-WC-Signature' => 'sha256=' . hash_hmac('sha256', $body, (string) Codegea_ERP_Settings::get('secret')),
-				'User-Agent' => 'codegea-erp/' . CODEGEA_ERP_VERSION . '; ' . home_url(),
+				'X-WC-Signature' => 'sha256=' . hash_hmac('sha256', $body, (string) Nimbus_ERP_Settings::get('secret')),
+				'User-Agent' => 'nimbus-erp-for-woocommerce/' . NIMBUS_ERP_VERSION . '; ' . home_url(),
 			),
 			'body' => $body,
 		));
@@ -42,34 +42,34 @@ final class Codegea_ERP_Client {
 	 * hacer, para mostrarlo en las pantallas sin volver a llamar al ERP.
 	 */
 	public static function ping() {
-		$result = self::post('ping', array('site' => home_url(), 'plugin_version' => CODEGEA_ERP_VERSION), 15);
+		$result = self::post('ping', array('site' => home_url(), 'plugin_version' => NIMBUS_ERP_VERSION), 15);
 		$info = array('ok' => $result['ok'], 'checked_at' => current_time('mysql'));
 		if ($result['ok'] && is_array($result['body'])) {
 			$info = array_merge($result['body'], $info);
 			self::refresh_warehouse_name($info);
 		} else {
 			// Se conserva lo último bueno (bodegas) para no perder la selección por un corte momentáneo.
-			$info = array_merge(Codegea_ERP_Settings::erp_info(), $info, array('error' => self::explain($result)));
+			$info = array_merge(Nimbus_ERP_Settings::erp_info(), $info, array('error' => self::explain($result)));
 		}
-		update_option(Codegea_ERP_Settings::ERP_INFO, $info, false);
-		Codegea_ERP_Log::add('conexión', home_url(), $result['ok'], $result['ok'] ? 'Conectado con ' . ($info['company'] ?: 'el ERP') : $info['error']);
+		update_option(Nimbus_ERP_Settings::ERP_INFO, $info, false);
+		Nimbus_ERP_Log::add('conexión', home_url(), $result['ok'], $result['ok'] ? 'Conectado con ' . ($info['company'] ?: 'el ERP') : $info['error']);
 		return $result;
 	}
 
 	/** El nombre de la bodega guardada puede haber cambiado en el ERP. */
 	private static function refresh_warehouse_name(array $info) {
-		$id = (int) Codegea_ERP_Settings::get('warehouse_id');
+		$id = (int) Nimbus_ERP_Settings::get('warehouse_id');
 		if (!$id) {
 			return;
 		}
 		foreach ((array) ($info['warehouses'] ?? array()) as $w) {
 			if ((int) $w['id'] === $id) {
-				Codegea_ERP_Settings::update(array('warehouse_name' => $w['name']));
+				Nimbus_ERP_Settings::update(array('warehouse_name' => $w['name']));
 				return;
 			}
 		}
 		// La bodega ya no existe en el ERP: se vuelve a la del ERP.
-		Codegea_ERP_Settings::update(array('warehouse_id' => 0, 'warehouse_name' => ''));
+		Nimbus_ERP_Settings::update(array('warehouse_id' => 0, 'warehouse_name' => ''));
 	}
 
 	private static function explain(array $result) {

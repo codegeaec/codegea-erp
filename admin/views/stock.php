@@ -2,11 +2,11 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
-// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// Vista incluida desde Nimbus_ERP_Admin::render(): sus variables son locales de ese método, no globales.
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-$s = Codegea_ERP_Settings::all();
-$info = Codegea_ERP_Settings::erp_info();
-$warehouses = Codegea_ERP_Settings::warehouses();
+$s = Nimbus_ERP_Settings::all();
+$info = Nimbus_ERP_Settings::erp_info();
+$warehouses = Nimbus_ERP_Settings::warehouses();
 $erp_default = null;
 foreach ($warehouses as $w) {
 	if ((int) $w['id'] === (int) ($info['stock_warehouse_id'] ?? 0)) {
@@ -14,17 +14,17 @@ foreach ($warehouses as $w) {
 	}
 }
 ?>
-<?php if (!Codegea_ERP_Settings::is_connected()) : ?>
+<?php if (!Nimbus_ERP_Settings::is_connected()) : ?>
 	<div class="notice notice-warning inline cerp-notice">
-		<p>Para elegir la bodega, primero <a href="<?php echo esc_url(Codegea_ERP_Admin::url('conexion')); ?>">conecta la tienda con el ERP</a>: las bodegas se listan desde allá.</p>
+		<p>Para elegir la bodega, primero <a href="<?php echo esc_url(Nimbus_ERP_Admin::url('conexion')); ?>">conecta la tienda con el ERP</a>: las bodegas se listan desde allá.</p>
 	</div>
 <?php endif; ?>
 
-<?php Codegea_ERP_Admin::form_open('stock'); ?>
+<?php Nimbus_ERP_Admin::form_open('stock'); ?>
 <section class="cerp-card">
 	<div class="cerp-card-head">
 		<h2>Bodega de la tienda</h2>
-		<?php if (Codegea_ERP_Settings::is_configured()) : ?>
+		<?php if (Nimbus_ERP_Settings::is_configured()) : ?>
 			<button type="submit" name="refresh" value="1" class="button cerp-btn-icon"><span class="dashicons dashicons-update" aria-hidden="true"></span>Actualizar lista</button>
 		<?php endif; ?>
 	</div>
@@ -46,8 +46,8 @@ foreach ($warehouses as $w) {
 				</label>
 			<?php endforeach; ?>
 		</div>
-		<p class="cerp-muted cerp-footnote">Lista traída del ERP <?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'] ?? '')); ?>. ¿Creaste una bodega nueva? Usa «Actualizar lista».</p>
-	<?php elseif (Codegea_ERP_Settings::is_connected()) : ?>
+		<p class="cerp-muted cerp-footnote">Lista traída del ERP <?php echo esc_html(Nimbus_ERP_Admin::ago($info['checked_at'] ?? '')); ?>. ¿Creaste una bodega nueva? Usa «Actualizar lista».</p>
+	<?php elseif (Nimbus_ERP_Settings::is_connected()) : ?>
 		<div class="notice notice-info inline cerp-notice"><p>El ERP todavía no tiene bodegas. Créalas en el ERP (Inventario → Bodegas) y actualiza la lista.</p></div>
 	<?php endif; ?>
 </section>

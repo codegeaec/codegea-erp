@@ -2,17 +2,17 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
-// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// Vista incluida desde Nimbus_ERP_Admin::render(): sus variables son locales de ese método, no globales.
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
-$entries = Codegea_ERP_Log::all();
+$entries = Nimbus_ERP_Log::all();
 ?>
 <section class="cerp-card">
 	<div class="cerp-card-head">
 		<h2>Últimos envíos al ERP</h2>
 		<?php if ($entries) : ?>
 			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-				<?php wp_nonce_field('codegea_erp'); ?>
-				<input type="hidden" name="action" value="codegea_erp_clear_log">
+				<?php wp_nonce_field('nimbus_erp'); ?>
+				<input type="hidden" name="action" value="nimbus_erp_clear_log">
 				<button type="submit" class="button-link cerp-link-danger">Vaciar registro</button>
 			</form>
 		<?php endif; ?>
@@ -28,7 +28,7 @@ $entries = Codegea_ERP_Log::all();
 			<tbody>
 			<?php foreach ($entries as $e) : ?>
 				<tr>
-					<td title="<?php echo esc_attr($e['time']); ?>"><?php echo esc_html(Codegea_ERP_Admin::ago($e['time'])); ?></td>
+					<td title="<?php echo esc_attr($e['time']); ?>"><?php echo esc_html(Nimbus_ERP_Admin::ago($e['time'])); ?></td>
 					<td><?php echo esc_html(ucfirst($e['type'])); ?></td>
 					<td><?php echo esc_html($e['ref']); ?></td>
 					<td>

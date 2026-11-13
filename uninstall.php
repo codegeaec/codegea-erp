@@ -3,6 +3,6 @@
 if (!defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
-delete_option('codegea_erp_settings');
-delete_option('codegea_erp_info');
-delete_option('codegea_erp_log');
+delete_option('nimbus_erp_settings');
+delete_option('nimbus_erp_info');
+delete_option('nimbus_erp_log');

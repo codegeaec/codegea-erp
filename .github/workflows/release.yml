@@ -1,5 +1,5 @@
 # Al subir un tag vX.Y.Z: comprueba que coincida con la versión del plugin y publica el release con
-# codegea-erp.zip (lo que descargan el ERP y las tiendas).
+# nimbus-erp-for-woocommerce.zip (lo que descargan el ERP y las tiendas).
 name: Release
 
 on:
@@ -18,8 +18,8 @@ jobs:
       - name: Versión del tag = versión del plugin
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          HEADER=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9.]+' codegea-erp.php)
-          CONST=$(grep -m1 -oP "CODEGEA_ERP_VERSION', '\K[0-9.]+" codegea-erp.php)
+          HEADER=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9.]+' nimbus-erp-for-woocommerce.php)
+          CONST=$(grep -m1 -oP "NIMBUS_ERP_VERSION', '\K[0-9.]+" nimbus-erp-for-woocommerce.php)
           STABLE=$(grep -m1 -oP '^Stable tag:\s*\K[0-9.]+' readme.txt)
           echo "tag=$TAG header=$HEADER const=$CONST stable=$STABLE"
           test "$TAG" = "$HEADER" && test "$TAG" = "$CONST" && test "$TAG" = "$STABLE"
@@ -28,9 +28,9 @@ jobs:
         run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
 
       - name: Zip
-        run: git archive --format=zip --prefix=codegea-erp/ -o codegea-erp.zip HEAD
+        run: git archive --format=zip --prefix=nimbus-erp-for-woocommerce/ -o nimbus-erp-for-woocommerce.zip HEAD
 
       - name: Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" codegea-erp.zip --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" nimbus-erp-for-woocommerce.zip --title "$GITHUB_REF_NAME" --generate-notes

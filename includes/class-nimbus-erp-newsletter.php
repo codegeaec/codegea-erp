@@ -5,28 +5,30 @@ if (!defined('ABSPATH')) {
 
 /**
  * Newsletter del ERP: casilla «Quiero recibir novedades» en el checkout (clásico y de bloques) y el shortcode
- * [codegea_erp_newsletter] con un formulario de suscripción. Las dos llaman al ERP firmadas
+ * [nimbus_erp_newsletter] con un formulario de suscripción. Las dos llaman al ERP firmadas
  * (`/webhook/newsletter`) con la IP del cliente; el ERP manda el correo de confirmación (doble opt-in), así
  * que nadie queda suscrito sin confirmar su correo.
  */
-final class Codegea_ERP_Newsletter {
-	const ACTION = 'codegea_erp_newsletter_subscribe';
-	const FIELD = 'codegea_erp_newsletter';
+final class Nimbus_ERP_Newsletter {
+	const ACTION = 'nimbus_erp_newsletter_subscribe';
+	const FIELD = 'nimbus_erp_newsletter';
 	/** Id del campo del checkout de bloques (Additional Checkout Fields API, WooCommerce 8.9+). */
-	const BLOCK_FIELD = 'codegea-erp/newsletter';
-	const DONE_META = '_codegea_erp_newsletter';
+	const BLOCK_FIELD = 'nimbus-erp-for-woocommerce/newsletter';
+	const DONE_META = '_nimbus_erp_newsletter';
 	/** Vuelve a preguntar al ERP si el newsletter está activo (Action Scheduler). */
-	const RECHECK_ACTION = 'codegea_erp_newsletter_recheck';
+	const RECHECK_ACTION = 'nimbus_erp_newsletter_recheck';
 	const RETRY_MINUTES = array(1, 5, 15);
 	const DEFAULT_LABEL = 'Quiero recibir novedades y ofertas por correo. Puedo darme de baja cuando quiera.';
 
 	public static function init() {
 		add_action(self::ACTION, array(__CLASS__, 'send'), 10, 2);
+		add_shortcode('nimbus_erp_newsletter', array(__CLASS__, 'shortcode'));
+		// Nombre anterior a 1.2.0 (Codegea ERP): las páginas que ya lo usan siguen funcionando.
 		add_shortcode('codegea_erp_newsletter', array(__CLASS__, 'shortcode'));
-		add_action('admin_post_nopriv_codegea_erp_newsletter', array(__CLASS__, 'form_submit'));
-		add_action('admin_post_codegea_erp_newsletter', array(__CLASS__, 'form_submit'));
-		add_action(self::RECHECK_ACTION, array('Codegea_ERP_Client', 'ping'));
-		if (Codegea_ERP_Settings::get('newsletter_checkout') !== 'yes' || !self::available()) {
+		add_action('admin_post_nopriv_nimbus_erp_newsletter', array(__CLASS__, 'form_submit'));
+		add_action('admin_post_nimbus_erp_newsletter', array(__CLASS__, 'form_submit'));
+		add_action(self::RECHECK_ACTION, array('Nimbus_ERP_Client', 'ping'));
+		if (Nimbus_ERP_Settings::get('newsletter_checkout') !== 'yes' || !self::available()) {
 			return;
 		}
 		// Checkout clásico.
@@ -43,33 +45,33 @@ final class Codegea_ERP_Newsletter {
 	 * consultar en segundo plano por si lo activaron.
 	 */
 	public static function available() {
-		if (!Codegea_ERP_Settings::is_connected()) {
+		if (!Nimbus_ERP_Settings::is_connected()) {
 			return false;
 		}
-		$info = Codegea_ERP_Settings::erp_info();
+		$info = Nimbus_ERP_Settings::erp_info();
 		if (!array_key_exists('newsletter', $info) || !empty($info['newsletter'])) {
 			return true;
 		}
 		$stale = strtotime((string) ($info['checked_at'] ?? '')) < current_time('timestamp') - 12 * HOUR_IN_SECONDS;
 		if ($stale && function_exists('as_enqueue_async_action') && !get_transient(self::RECHECK_ACTION)) {
 			set_transient(self::RECHECK_ACTION, 1, HOUR_IN_SECONDS);
-			as_enqueue_async_action(self::RECHECK_ACTION, array(), 'codegea-erp');
+			as_enqueue_async_action(self::RECHECK_ACTION, array(), 'nimbus-erp-for-woocommerce');
 		}
 		return false;
 	}
 
 	/** El ERP dice en cada alta si el newsletter sigue activo: se guarda para ocultar o volver a mostrar. */
 	private static function remember_available($active) {
-		$info = Codegea_ERP_Settings::erp_info();
+		$info = Nimbus_ERP_Settings::erp_info();
 		if (!$info || ($info['newsletter'] ?? null) === $active) {
 			return;
 		}
 		$info['newsletter'] = $active;
-		update_option(Codegea_ERP_Settings::ERP_INFO, $info, false);
+		update_option(Nimbus_ERP_Settings::ERP_INFO, $info, false);
 	}
 
 	public static function label() {
-		$label = trim((string) Codegea_ERP_Settings::get('newsletter_label'));
+		$label = trim((string) Nimbus_ERP_Settings::get('newsletter_label'));
 		return $label !== '' ? $label : self::DEFAULT_LABEL;
 	}
 
@@ -78,7 +80,7 @@ final class Codegea_ERP_Newsletter {
 	public static function checkout_field() {
 		// Sin marcar: el consentimiento tiene que ser un acto del cliente.
 		printf(
-			'<p class="form-row codegea-erp-newsletter"><label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox"><input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="%s" value="1"> <span>%s</span></label></p>',
+			'<p class="form-row nimbus-erp-for-woocommerce-newsletter"><label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox"><input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="%s" value="1"> <span>%s</span></label></p>',
 			esc_attr(self::FIELD),
 			esc_html(self::label())
 		);
@@ -110,7 +112,7 @@ final class Codegea_ERP_Newsletter {
 	}
 
 	private static function from_order($order) {
-		if (!$order || $order->get_meta(self::DONE_META)) {
+		if (!$order || $order->get_meta(self::DONE_META) || $order->get_meta('_codegea_erp_newsletter')) {
 			return;
 		}
 		$order->update_meta_data(self::DONE_META, current_time('mysql'));
@@ -127,7 +129,7 @@ final class Codegea_ERP_Newsletter {
 	/** En segundo plano: el checkout no espera al ERP y, si no responde, se reintenta. */
 	private static function enqueue(array $data, $attempt, $delay_minutes) {
 		if (function_exists('as_schedule_single_action')) {
-			as_schedule_single_action(time() + $delay_minutes * MINUTE_IN_SECONDS, self::ACTION, array('data' => $data, 'attempt' => (int) $attempt), 'codegea-erp');
+			as_schedule_single_action(time() + $delay_minutes * MINUTE_IN_SECONDS, self::ACTION, array('data' => $data, 'attempt' => (int) $attempt), 'nimbus-erp-for-woocommerce');
 		} else {
 			self::send($data, $attempt);
 		}
@@ -145,26 +147,26 @@ final class Codegea_ERP_Newsletter {
 
 	/** @return array{ok:bool,code:int,message:string} */
 	private static function post(array $data) {
-		$result = Codegea_ERP_Client::post('newsletter', $data, 15);
+		$result = Nimbus_ERP_Client::post('newsletter', $data, 15);
 		$body = is_array($result['body']) ? $result['body'] : array();
 		$ok = $result['ok'] && !empty($body['ok']);
 		if ($result['ok'] && array_key_exists('newsletter', $body)) {
 			self::remember_available((bool) $body['newsletter']);
 		}
 		$message = $result['ok'] ? (string) ($body['message'] ?? '') : $result['error'];
-		Codegea_ERP_Log::add('newsletter', (string) ($data['email'] ?? ''), $ok, $message);
+		Nimbus_ERP_Log::add('newsletter', (string) ($data['email'] ?? ''), $ok, $message);
 		return array('ok' => $ok, 'code' => (int) $result['code'], 'message' => $message);
 	}
 
 	// ── Shortcode ──
 
-	/** [codegea_erp_newsletter button="Suscribirme" name="yes"] */
+	/** [nimbus_erp_newsletter button="Suscribirme" name="yes"] */
 	public static function shortcode($atts) {
 		if (!self::available()) {
 			return ''; // Newsletter apagado en el ERP: no se muestra un formulario que no funcionaría.
 		}
-		$atts = shortcode_atts(array('button' => 'Suscribirme', 'name' => 'yes'), $atts, 'codegea_erp_newsletter');
-		wp_enqueue_style('codegea-erp-newsletter', plugins_url('public/css/newsletter.css', CODEGEA_ERP_FILE), array(), CODEGEA_ERP_VERSION);
+		$atts = shortcode_atts(array('button' => 'Suscribirme', 'name' => 'yes'), $atts, 'nimbus_erp_newsletter');
+		wp_enqueue_style('nimbus-erp-for-woocommerce-newsletter', plugins_url('public/css/newsletter.css', NIMBUS_ERP_FILE), array(), NIMBUS_ERP_VERSION);
 		$notice = '';
 		$key = isset($_GET['cerp_nl']) ? sanitize_key(wp_unslash($_GET['cerp_nl'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 		$result = $key !== '' ? get_transient('cerp_nl_' . $key) : false;
@@ -175,7 +177,7 @@ final class Codegea_ERP_Newsletter {
 		?>
 		<form id="cerp-nl" class="cerp-nl" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 			<?php echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput -- escapado arriba. ?>
-			<input type="hidden" name="action" value="codegea_erp_newsletter">
+			<input type="hidden" name="action" value="nimbus_erp_newsletter">
 			<input type="hidden" name="back" value="<?php echo esc_url(remove_query_arg('cerp_nl')); ?>">
 			<input type="email" name="email" required placeholder="tu@correo.com" aria-label="Correo">
 			<?php if ($atts['name'] !== 'no') : ?>
@@ -198,7 +200,7 @@ final class Codegea_ERP_Newsletter {
 		$back = wp_validate_redirect(esc_url_raw($in['back'] ?? ''), home_url('/'));
 		if (!empty($in['website'])) {
 			$result = array('ok' => true, 'message' => 'Te enviamos un correo para confirmar la suscripción.');
-		} elseif (!Codegea_ERP_Settings::is_configured()) {
+		} elseif (!Nimbus_ERP_Settings::is_configured()) {
 			$result = array('ok' => false, 'message' => 'La suscripción no está disponible en este momento.');
 		} else {
 			$result = self::post(array(

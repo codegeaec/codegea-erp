@@ -4,8 +4,8 @@ if (!defined('ABSPATH')) {
 }
 
 /** Últimos envíos al ERP (pestaña Registro): sirve para diagnosticar sin entrar al servidor. */
-final class Codegea_ERP_Log {
-	const OPTION = 'codegea_erp_log';
+final class Nimbus_ERP_Log {
+	const OPTION = 'nimbus_erp_log';
 	const MAX = 50;
 
 	public static function add($type, $ref, $ok, $message = '') {

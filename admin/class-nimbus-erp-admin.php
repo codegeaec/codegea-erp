@@ -3,9 +3,9 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-/** Pantallas en WooCommerce → Codegea ERP: Conexión, Pedidos, Stock, Newsletter y Registro. */
-final class Codegea_ERP_Admin {
-	const PAGE = 'codegea-erp';
+/** Pantallas en WooCommerce → Nimbus ERP: Conexión, Pedidos, Stock, Newsletter y Registro. */
+final class Nimbus_ERP_Admin {
+	const PAGE = 'nimbus-erp-for-woocommerce';
 	const TABS = array(
 		'conexion' => array('label' => 'Conexión', 'icon' => 'admin-links'),
 		'pedidos' => array('label' => 'Pedidos', 'icon' => 'cart'),
@@ -17,20 +17,20 @@ final class Codegea_ERP_Admin {
 	public static function init() {
 		add_action('admin_menu', array(__CLASS__, 'menu'), 99);
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'assets'));
-		add_action('admin_post_codegea_erp_save', array(__CLASS__, 'save'));
-		add_action('admin_post_codegea_erp_ping', array(__CLASS__, 'ping'));
-		add_action('admin_post_codegea_erp_clear_log', array(__CLASS__, 'clear_log'));
+		add_action('admin_post_nimbus_erp_save', array(__CLASS__, 'save'));
+		add_action('admin_post_nimbus_erp_ping', array(__CLASS__, 'ping'));
+		add_action('admin_post_nimbus_erp_clear_log', array(__CLASS__, 'clear_log'));
 	}
 
 	public static function menu() {
-		add_submenu_page('woocommerce', 'Codegea ERP', 'Codegea ERP', 'manage_woocommerce', self::PAGE, array(__CLASS__, 'render'));
+		add_submenu_page('woocommerce', 'Nimbus ERP', 'Nimbus ERP', 'manage_woocommerce', self::PAGE, array(__CLASS__, 'render'));
 	}
 
 	public static function assets($hook) {
 		if (strpos((string) $hook, self::PAGE) === false) {
 			return;
 		}
-		wp_enqueue_style('codegea-erp-admin', plugins_url('admin/css/admin.css', CODEGEA_ERP_FILE), array(), CODEGEA_ERP_VERSION);
+		wp_enqueue_style('nimbus-erp-for-woocommerce-admin', plugins_url('admin/css/admin.css', NIMBUS_ERP_FILE), array(), NIMBUS_ERP_VERSION);
 	}
 
 	public static function url($tab, array $extra = array()) {
@@ -40,13 +40,13 @@ final class Codegea_ERP_Admin {
 	/** Solo usuarios que gestionan WooCommerce; cada acción verifica además el nonce del formulario. */
 	private static function check() {
 		if (!current_user_can('manage_woocommerce')) {
-			wp_die(esc_html__('No tienes permiso para esto.', 'codegea-erp'));
+			wp_die(esc_html__('No tienes permiso para esto.', 'nimbus-erp-for-woocommerce'));
 		}
 	}
 
 	public static function save() {
 		self::check();
-		check_admin_referer('codegea_erp');
+		check_admin_referer('nimbus_erp');
 		$tab = sanitize_key($_POST['tab'] ?? 'conexion');
 		$in = wp_unslash($_POST);
 		$values = array();
@@ -58,13 +58,13 @@ final class Codegea_ERP_Admin {
 			}
 		} elseif ($tab === 'pedidos') {
 			$mode = sanitize_key($in['order_mode'] ?? 'confirm');
-			$values['order_mode'] = isset(Codegea_ERP_Settings::ORDER_MODES[$mode]) ? $mode : 'confirm';
+			$values['order_mode'] = isset(Nimbus_ERP_Settings::ORDER_MODES[$mode]) ? $mode : 'confirm';
 			$statuses = array_map('sanitize_key', (array) ($in['order_statuses'] ?? array()));
-			$values['order_statuses'] = array_values(array_intersect($statuses, array_keys(Codegea_ERP_Settings::ORDER_STATUSES)));
+			$values['order_statuses'] = array_values(array_intersect($statuses, array_keys(Nimbus_ERP_Settings::ORDER_STATUSES)));
 		} elseif ($tab === 'stock') {
 			$id = absint($in['warehouse_id'] ?? 0);
 			$name = '';
-			foreach (Codegea_ERP_Settings::warehouses() as $w) {
+			foreach (Nimbus_ERP_Settings::warehouses() as $w) {
 				if ((int) $w['id'] === $id) {
 					$name = $w['name'];
 				}
@@ -76,10 +76,10 @@ final class Codegea_ERP_Admin {
 			$values['newsletter_checkout'] = !empty($in['newsletter_checkout']) ? 'yes' : 'no';
 			$values['newsletter_label'] = sanitize_text_field($in['newsletter_label'] ?? '');
 		}
-		Codegea_ERP_Settings::update($values);
+		Nimbus_ERP_Settings::update($values);
 		// «Actualizar lista» de Stock guarda lo elegido y vuelve a pedir las bodegas al ERP.
-		if (($tab === 'conexion' || !empty($in['refresh'])) && Codegea_ERP_Settings::is_configured()) {
-			Codegea_ERP_Client::ping();
+		if (($tab === 'conexion' || !empty($in['refresh'])) && Nimbus_ERP_Settings::is_configured()) {
+			Nimbus_ERP_Client::ping();
 		}
 		wp_safe_redirect(self::url($tab, array('saved' => 1)));
 		exit;
@@ -87,8 +87,8 @@ final class Codegea_ERP_Admin {
 
 	public static function ping() {
 		self::check();
-		check_admin_referer('codegea_erp');
-		Codegea_ERP_Client::ping();
+		check_admin_referer('nimbus_erp');
+		Nimbus_ERP_Client::ping();
 		$back = sanitize_key($_POST['back'] ?? 'conexion');
 		wp_safe_redirect(self::url(isset(self::TABS[$back]) ? $back : 'conexion', array('pinged' => 1)));
 		exit;
@@ -96,8 +96,8 @@ final class Codegea_ERP_Admin {
 
 	public static function clear_log() {
 		self::check();
-		check_admin_referer('codegea_erp');
-		Codegea_ERP_Log::clear();
+		check_admin_referer('nimbus_erp');
+		Nimbus_ERP_Log::clear();
 		wp_safe_redirect(self::url('registro'));
 		exit;
 	}
@@ -106,7 +106,7 @@ final class Codegea_ERP_Admin {
 		// Solo elige la pestaña que se muestra: no cambia nada, no lleva nonce.
 		$tab = sanitize_key(wp_unslash($_GET['tab'] ?? '')); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if (!isset(self::TABS[$tab])) {
-			$tab = Codegea_ERP_Settings::is_connected() ? 'pedidos' : 'conexion';
+			$tab = Nimbus_ERP_Settings::is_connected() ? 'pedidos' : 'conexion';
 		}
 		echo '<div class="wrap cerp">';
 		self::header();
@@ -125,18 +125,18 @@ final class Codegea_ERP_Admin {
 			);
 		}
 		echo '</nav><div class="cerp-layout"><div class="cerp-main">';
-		require CODEGEA_ERP_DIR . "admin/views/{$tab}.php";
+		require NIMBUS_ERP_DIR . "admin/views/{$tab}.php";
 		echo '</div><aside class="cerp-aside">';
-		require CODEGEA_ERP_DIR . 'admin/views/help.php';
+		require NIMBUS_ERP_DIR . 'admin/views/help.php';
 		echo '</aside></div></div>';
 	}
 
 	/** Título y estado de la conexión, visible en todas las pestañas. */
 	private static function header() {
-		$info = Codegea_ERP_Settings::erp_info();
-		if (Codegea_ERP_Settings::is_connected()) {
+		$info = Nimbus_ERP_Settings::erp_info();
+		if (Nimbus_ERP_Settings::is_connected()) {
 			$pill = array('ok', 'yes-alt', 'Conectado' . (!empty($info['company']) ? ' con ' . $info['company'] : ''));
-		} elseif (!Codegea_ERP_Settings::is_configured()) {
+		} elseif (!Nimbus_ERP_Settings::is_configured()) {
 			$pill = array('off', 'marker', 'Sin configurar');
 		} elseif (!empty($info['checked_at'])) {
 			$pill = array('error', 'warning', 'Sin conexión');
@@ -146,10 +146,10 @@ final class Codegea_ERP_Admin {
 		?>
 		<div class="cerp-header">
 			<div class="cerp-brand">
-				<img class="cerp-logo" src="<?php echo esc_url(plugins_url('admin/images/codegea-mark.svg', CODEGEA_ERP_FILE)); ?>" alt="" width="40" height="40">
+				<img class="cerp-logo" src="<?php echo esc_url(plugins_url('admin/images/codegea-mark.svg', NIMBUS_ERP_FILE)); ?>" alt="Codegea" width="40" height="40">
 				<div>
-					<h1>Codegea ERP</h1>
-					<p>Pedidos y stock de tu tienda, al día en el ERP.</p>
+					<h1>Nimbus ERP</h1>
+					<p>Pedidos y stock de tu tienda, al día en el ERP · por Codegea</p>
 				</div>
 			</div>
 			<span class="cerp-pill cerp-pill--<?php echo esc_attr($pill[0]); ?>"><span class="dashicons dashicons-<?php echo esc_attr($pill[1]); ?>" aria-hidden="true"></span><?php echo esc_html($pill[2]); ?></span>
@@ -158,15 +158,15 @@ final class Codegea_ERP_Admin {
 	}
 
 	/** Abre el formulario de una pestaña (nonce + acción de guardado). */
-	public static function form_open($tab, $action = 'codegea_erp_save') {
+	public static function form_open($tab, $action = 'nimbus_erp_save') {
 		printf('<form method="post" action="%s">', esc_url(admin_url('admin-post.php')));
-		wp_nonce_field('codegea_erp');
+		wp_nonce_field('nimbus_erp');
 		printf('<input type="hidden" name="action" value="%s"><input type="hidden" name="tab" value="%s"><input type="hidden" name="back" value="%s">', esc_attr($action), esc_attr($tab), esc_attr($tab));
 	}
 
 	/** Botón «Probar conexión» como formulario propio (se usa en Conexión y en Stock). */
 	public static function ping_button($back, $label = 'Probar conexión', $class = 'button') {
-		self::form_open($back, 'codegea_erp_ping');
+		self::form_open($back, 'nimbus_erp_ping');
 		printf('<button type="submit" class="%s cerp-btn-icon"><span class="dashicons dashicons-update" aria-hidden="true"></span>%s</button></form>', esc_attr($class), esc_html($label));
 	}
 

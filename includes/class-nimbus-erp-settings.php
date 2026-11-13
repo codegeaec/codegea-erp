@@ -3,11 +3,11 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-/** Ajustes del plugin (una sola opción `codegea_erp_settings`). */
-final class Codegea_ERP_Settings {
-	const OPTION = 'codegea_erp_settings';
+/** Ajustes del plugin (una sola opción `nimbus_erp_settings`). */
+final class Nimbus_ERP_Settings {
+	const OPTION = 'nimbus_erp_settings';
 	/** Última respuesta de «Probar conexión» (empresa, bodegas) o su error. */
-	const ERP_INFO = 'codegea_erp_info';
+	const ERP_INFO = 'nimbus_erp_info';
 
 	const ORDER_MODES = array(
 		'draft' => array(

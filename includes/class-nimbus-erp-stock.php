@@ -8,11 +8,11 @@ if (!defined('ABSPATH')) {
  * CSV…). No se envían:
  * - los descuentos/devoluciones de stock por pedidos: el ERP ya los descuenta al recibir el pedido (si no, se
  *   descontaría dos veces);
- * - los cambios que hace el propio ERP por la API REST (header X-Codegea-Erp): volverían al ERP sin cambios.
+ * - los cambios que hace el propio ERP por la API REST (header X-Nimbus-Erp): volverían al ERP sin cambios.
  * El ERP ajusta la bodega elegida (pestaña Stock) al valor que tiene la tienda.
  */
-final class Codegea_ERP_Stock {
-	const ACTION = 'codegea_erp_send_stock';
+final class Nimbus_ERP_Stock {
+	const ACTION = 'nimbus_erp_send_stock';
 
 	/** true mientras WooCommerce descuenta o repone stock por un pedido. */
 	private static $order_stock_change = false;
@@ -40,12 +40,12 @@ final class Codegea_ERP_Stock {
 	}
 
 	private static function comes_from_erp() {
-		return defined('REST_REQUEST') && REST_REQUEST && !empty($_SERVER['HTTP_X_CODEGEA_ERP']);
+		return defined('REST_REQUEST') && REST_REQUEST && (!empty($_SERVER['HTTP_X_NIMBUS_ERP']) || !empty($_SERVER['HTTP_X_CODEGEA_ERP']));
 	}
 
 	/** @param WC_Product $product */
 	public static function on_stock_set($product) {
-		if (Codegea_ERP_Settings::get('stock_to_erp') !== 'yes' || self::$order_stock_change || self::comes_from_erp()) {
+		if (Nimbus_ERP_Settings::get('stock_to_erp') !== 'yes' || self::$order_stock_change || self::comes_from_erp()) {
 			return;
 		}
 		if (!$product->get_sku() || !$product->managing_stock()) {
@@ -53,11 +53,11 @@ final class Codegea_ERP_Stock {
 		}
 		$args = array('product_id' => (int) $product->get_id());
 		// Varias ediciones seguidas del mismo producto → un solo envío con el valor final.
-		if (function_exists('as_has_scheduled_action') && as_has_scheduled_action(self::ACTION, $args, 'codegea-erp')) {
+		if (function_exists('as_has_scheduled_action') && as_has_scheduled_action(self::ACTION, $args, 'nimbus-erp-for-woocommerce')) {
 			return;
 		}
 		if (function_exists('as_schedule_single_action')) {
-			as_schedule_single_action(time() + 30, self::ACTION, $args, 'codegea-erp');
+			as_schedule_single_action(time() + 30, self::ACTION, $args, 'nimbus-erp-for-woocommerce');
 		} else {
 			self::send($args['product_id']);
 		}
@@ -70,9 +70,9 @@ final class Codegea_ERP_Stock {
 		}
 		$data = array(
 			'items' => array(array('sku' => $product->get_sku(), 'stock' => (float) $product->get_stock_quantity())),
-			'warehouse_id' => (int) Codegea_ERP_Settings::get('warehouse_id') ?: null,
+			'warehouse_id' => (int) Nimbus_ERP_Settings::get('warehouse_id') ?: null,
 		);
-		$result = Codegea_ERP_Client::post('stock', $data);
-		Codegea_ERP_Log::add('stock', $product->get_sku(), $result['ok'], $result['ok'] ? 'Stock ' . $product->get_stock_quantity() : $result['error']);
+		$result = Nimbus_ERP_Client::post('stock', $data);
+		Nimbus_ERP_Log::add('stock', $product->get_sku(), $result['ok'], $result['ok'] ? 'Stock ' . $product->get_stock_quantity() : $result['error']);
 	}
 }

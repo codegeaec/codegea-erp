@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
-// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// Vista incluida desde Nimbus_ERP_Admin::render(): sus variables son locales de ese método, no globales.
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 /*
  * Una sola acción por estado, para no confundir:
@@ -10,17 +10,17 @@ if (!defined('ABSPATH')) {
  * - Configurado: arriba el estado con «Probar de nuevo»; los datos quedan plegados en «Cambiar datos de
  *   conexión» (abiertos si la conexión falló, porque lo más probable es que haya que corregirlos).
  */
-$s = Codegea_ERP_Settings::all();
-$info = Codegea_ERP_Settings::erp_info();
-$configured = Codegea_ERP_Settings::is_configured();
-$connected = Codegea_ERP_Settings::is_connected();
+$s = Nimbus_ERP_Settings::all();
+$info = Nimbus_ERP_Settings::erp_info();
+$configured = Nimbus_ERP_Settings::is_configured();
+$connected = Nimbus_ERP_Settings::is_connected();
 $tested = !empty($info['checked_at']);
 ?>
 <?php if ($configured) : ?>
 	<section class="cerp-card">
 		<div class="cerp-card-head">
 			<h2>Estado de la conexión</h2>
-			<?php Codegea_ERP_Admin::ping_button('conexion', 'Probar de nuevo'); ?>
+			<?php Nimbus_ERP_Admin::ping_button('conexion', 'Probar de nuevo'); ?>
 		</div>
 		<?php if ($connected) : ?>
 			<div class="notice notice-success inline cerp-notice">
@@ -29,14 +29,14 @@ $tested = !empty($info['checked_at']);
 			</div>
 			<dl class="cerp-facts">
 				<?php if (!empty($info['tenant'])) : ?><div><dt>Empresa en el ERP</dt><dd><?php echo esc_html($info['tenant']); ?></dd></div><?php endif; ?>
-				<div><dt>Bodega de la tienda</dt><dd><?php echo esc_html(Codegea_ERP_Settings::warehouse_label()); ?> · <a href="<?php echo esc_url(Codegea_ERP_Admin::url('stock')); ?>">cambiar</a></dd></div>
-				<div><dt>Comprobado</dt><dd><?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'])); ?></dd></div>
+				<div><dt>Bodega de la tienda</dt><dd><?php echo esc_html(Nimbus_ERP_Settings::warehouse_label()); ?> · <a href="<?php echo esc_url(Nimbus_ERP_Admin::url('stock')); ?>">cambiar</a></dd></div>
+				<div><dt>Comprobado</dt><dd><?php echo esc_html(Nimbus_ERP_Admin::ago($info['checked_at'])); ?></dd></div>
 			</dl>
 		<?php elseif ($tested) : ?>
 			<div class="notice notice-error inline cerp-notice">
 				<p><strong>No se pudo conectar.</strong> <?php echo esc_html($info['error'] ?? ''); ?></p>
 			</div>
-			<p class="cerp-muted">Último intento <?php echo esc_html(Codegea_ERP_Admin::ago($info['checked_at'])); ?>. Mientras tanto los pedidos no se pierden: se reintentan solos.</p>
+			<p class="cerp-muted">Último intento <?php echo esc_html(Nimbus_ERP_Admin::ago($info['checked_at'])); ?>. Mientras tanto los pedidos no se pierden: se reintentan solos.</p>
 		<?php else : ?>
 			<p class="cerp-muted">Todavía no se probó la conexión.</p>
 		<?php endif; ?>
@@ -55,7 +55,7 @@ $tested = !empty($info['checked_at']);
 <section class="cerp-card">
 	<h2>Datos de conexión</h2>
 <?php endif; ?>
-	<?php Codegea_ERP_Admin::form_open('conexion'); ?>
+	<?php Nimbus_ERP_Admin::form_open('conexion'); ?>
 	<div class="cerp-field">
 		<label for="erp_url">URL del ERP</label>
 		<input id="erp_url" name="erp_url" type="url" class="regular-text" required value="<?php echo esc_attr($s['erp_url']); ?>" placeholder="https://empresa.codegea.com">
