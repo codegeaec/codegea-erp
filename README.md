@@ -1,8 +1,20 @@
-# Nimbus ERP for WooCommerce — plugin de WordPress
+<p align="center"><img src=".wordpress-org/banner-1544x500.png" alt="Nimbus ERP for WooCommerce" width="100%"></p>
 
-Conecta una tienda **WooCommerce** con **Nimbus ERP**, desarrollado por [Codegea](https://codegea.com) (`codegeaec/crm-erp`, plugin `wordpress` del ERP).
+<p align="center">
+  <a href="https://github.com/codegeaec/nimbus-erp-for-woocommerce/releases/latest/download/nimbus-erp-for-woocommerce.zip"><img alt="Descargar" src="https://img.shields.io/github/v/release/codegeaec/nimbus-erp-for-woocommerce?label=descargar&color=ea580c"></a>
+  <img alt="WordPress 6.4+" src="https://img.shields.io/badge/WordPress-6.4%2B-0f172a">
+  <img alt="WooCommerce 8.0+" src="https://img.shields.io/badge/WooCommerce-8.0%2B-7f54b3">
+  <img alt="PHP 7.4+" src="https://img.shields.io/badge/PHP-7.4%2B-777bb4">
+  <img alt="Licencia GPL v2+" src="https://img.shields.io/badge/licencia-GPL%20v2%2B-334155">
+</p>
+
+# Nimbus ERP for WooCommerce
+
+Conecta una tienda **WooCommerce** con **Nimbus ERP**: los pedidos pagados llegan al ERP como ventas (en borrador, confirmadas o facturadas), el stock de la tienda sigue a una bodega del ERP y las suscripciones al newsletter llegan con doble opt-in. Desarrollado por [Codegea](https://codegea.com) (el ERP es `codegeaec/crm-erp`, plugin `wordpress`).
 
 **Descargar:** [último release](https://github.com/codegeaec/nimbus-erp-for-woocommerce/releases/latest/download/nimbus-erp-for-woocommerce.zip) · Web: [codegea.com](https://codegea.com)
+
+<p align="center"><img src=".wordpress-org/screenshot-2.png" alt="Pantalla de pedidos del plugin" width="85%"></p>
 
 | Dirección | Qué viaja | Cómo |
 |---|---|---|
@@ -55,3 +67,10 @@ El laboratorio del ERP (`pnpm wp:lab` en crm-erp) instala este plugin desde `../
    `https://github.com/codegeaec/nimbus-erp-for-woocommerce/releases/latest/download/nimbus-erp-for-woocommerce.zip`.
 
 Licencia GPL v2 o posterior (requisito del directorio de WordPress.org; ver `readme.txt` y `LICENSE`).
+
+## Ícono, banner y capturas de WordPress.org
+
+`.wordpress-org/` tiene los archivos de la ficha del directorio (`icon-128x128.png`, `icon-256x256.png`, `icon.svg`,
+`banner-772x250.png`, `banner-1544x500.png`, `screenshot-1..5.png`, en el orden de `== Screenshots ==` del `readme.txt`).
+No van en el zip del plugin (`export-ignore`): se suben a la carpeta `assets/` del SVN de WordPress.org, a mano o con la
+acción `10up/action-wordpress-plugin-deploy`, que los toma de esta carpeta.
