@@ -9,7 +9,7 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Connects your WooCommerce store with the Codegea ERP: orders arrive as sales (draft, confirmed or invoiced) and stock stays in sync with an ERP warehouse.
+Sends WooCommerce orders to the Codegea ERP as sales and keeps the store stock in sync with an ERP warehouse.
 
 == Description ==
 
