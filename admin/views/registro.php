@@ -2,6 +2,8 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 $entries = Codegea_ERP_Log::all();
 ?>
 <section class="cerp-card">

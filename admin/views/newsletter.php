@@ -2,6 +2,8 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 $s = Codegea_ERP_Settings::all();
 $info = Codegea_ERP_Settings::erp_info();
 $known = Codegea_ERP_Settings::is_connected() && array_key_exists('newsletter', $info);

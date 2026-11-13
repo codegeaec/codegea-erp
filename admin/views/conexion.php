@@ -2,6 +2,8 @@
 if (!defined('ABSPATH')) {
 	exit;
 }
+// Vista incluida desde Codegea_ERP_Admin::render(): sus variables son locales de ese método, no globales.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 /*
  * Una sola acción por estado, para no confundir:
  * - Sin configurar: el formulario con «Conectar con el ERP» (guarda y prueba).
