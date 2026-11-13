@@ -37,15 +37,16 @@ final class Codegea_ERP_Admin {
 		return add_query_arg(array_merge(array('page' => self::PAGE, 'tab' => $tab), $extra), admin_url('admin.php'));
 	}
 
+	/** Solo usuarios que gestionan WooCommerce; cada acción verifica además el nonce del formulario. */
 	private static function check() {
 		if (!current_user_can('manage_woocommerce')) {
 			wp_die(esc_html__('No tienes permiso para esto.', 'codegea-erp'));
 		}
-		check_admin_referer('codegea_erp');
 	}
 
 	public static function save() {
 		self::check();
+		check_admin_referer('codegea_erp');
 		$tab = sanitize_key($_POST['tab'] ?? 'conexion');
 		$in = wp_unslash($_POST);
 		$values = array();
@@ -86,6 +87,7 @@ final class Codegea_ERP_Admin {
 
 	public static function ping() {
 		self::check();
+		check_admin_referer('codegea_erp');
 		Codegea_ERP_Client::ping();
 		$back = sanitize_key($_POST['back'] ?? 'conexion');
 		wp_safe_redirect(self::url(isset(self::TABS[$back]) ? $back : 'conexion', array('pinged' => 1)));
@@ -94,20 +96,22 @@ final class Codegea_ERP_Admin {
 
 	public static function clear_log() {
 		self::check();
+		check_admin_referer('codegea_erp');
 		Codegea_ERP_Log::clear();
 		wp_safe_redirect(self::url('registro'));
 		exit;
 	}
 
 	public static function render() {
-		$tab = sanitize_key($_GET['tab'] ?? '');
+		// Solo elige la pestaña que se muestra: no cambia nada, no lleva nonce.
+		$tab = sanitize_key(wp_unslash($_GET['tab'] ?? '')); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if (!isset(self::TABS[$tab])) {
 			$tab = Codegea_ERP_Settings::is_connected() ? 'pedidos' : 'conexion';
 		}
 		echo '<div class="wrap cerp">';
 		self::header();
 		echo '<hr class="wp-header-end">';
-		if (isset($_GET['saved'])) {
+		if (isset($_GET['saved'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-success is-dismissible inline"><p>Cambios guardados.</p></div>';
 		}
 		echo '<nav class="cerp-tabs" aria-label="Secciones">';
